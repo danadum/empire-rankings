@@ -255,7 +255,7 @@ const app = Vue.createApp({
 
         async toggleAllianceRanking() {
             this.alliance_ranking = !this.alliance_ranking;
-            if (!(current_event_name in this.eventsList)) {
+            if (!(this.current_event_name in this.eventsList)) {
                 this.current_event_name = Object.keys(this.eventsList)[0];
             }
             this.current_category_index = 0;
@@ -273,7 +273,7 @@ const app = Vue.createApp({
         },
 
         nbMedals(player, type) {
-            return player[this.offset(2 + alliance_ranking)].KLMO.filter(medal => medal[0] == type)[0][1];
+            return player[this.offset(2 + this.alliance_ranking)].KLMO.filter(medal => medal[0] == type)[0][1];
         }
     },
 
