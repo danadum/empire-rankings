@@ -171,10 +171,10 @@ const app = Vue.createApp({
             }
             if (players.length != 0) {
                 if (this.currentEvent.id != undefined) {
-                    this.current_category_index = this.currentEvent.categories.indexOf(this.currentEvent.categories.filter(category => category.id == jsonData.content.LID)[0]);                
+                    this.current_category_index = this.currentEvent.categories.indexOf(this.currentEvent.categories.find(category => category.id == jsonData.content.LID));                
                 }
                 else {
-                    this.current_category_index = this.currentEvent.categories.indexOf(this.currentEvent.categories.filter(category => category.eventid == jsonData.content.LT && category.id == jsonData.content.LID)[0]);                
+                    this.current_category_index = this.currentEvent.categories.indexOf(this.currentEvent.categories.find(category => category.eventid == jsonData.content.LT && category.id == jsonData.content.LID));                
                 }
                 if (this.current_category_index == -1) {
                     this.current_category_index = 0;
@@ -273,8 +273,9 @@ const app = Vue.createApp({
         },
 
         nbMedals(player, type) {
-            if ("KLMO" in player[this.offset(2 + this.alliance_ranking)]) {
-                return player[this.offset(2 + this.alliance_ranking)].KLMO.filter(medal => medal[0] == type)[0][1];
+            let player_data = player[this.offset(2 + this.alliance_ranking)];
+            if (player_data instanceof Object && "KLMO" in player_data) {
+                return player_data.KLMO.find(medal => medal[0] == type)[1];
             }
             else {
                 return 0;
