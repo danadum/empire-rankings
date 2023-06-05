@@ -62,21 +62,31 @@ const app = Vue.createApp({
                 <button @click="this.lastPage"><img src="assets/double_arrow_up.svg" alt="last page" style="transform:rotate(180deg);"/></button>
             </div>
             <table id="table">
+                <colgroup>
+                    <col class="small_column">
+                    <col>
+                    <col>
+                    <col class="small_column" v-if="this.hasPoints">
+                    <col class="small_column" v-if="this.hasMedals && !this.alliance_ranking">
+                    <col v-if="this.hasMedals">
+                </colgroup>
                 <thead>
                     <tr v-if="this.nbCategories > 1">
-                        <th id="category" colspan="4">
+                        <th id="category" colspan="10">
                             <div>
                                 <button @click="this.previousCategory"><img src="assets/arrow_up.svg" alt="next category" :class="this.current_language == 'ar' ? 'rightArrow' : 'leftArrow'"/></button>
-                                <p> {{ this.texts[this.currentCategory.name].replace(this.currentCategory.placeholder || '{0}', this.currentCategory.value) }}</p>
+                                <p> {{ this.texts[this.currentCategory.name].replace(this.currentCategory.placeholder ?? '{0}', this.currentCategory.value) }}</p>
                                 <button @click="this.nextCategory"><img src="assets/arrow_up.svg" alt="previous category" :class="this.current_language == 'ar' ? 'leftArrow' : 'rightArrow'"/></button>
                             </div>                   
                         </th>
                     </tr>
                     <tr>
-                        <th>{{ this.texts.rank }}</th>
+                        <th class="small_column">{{ this.texts.rank }}</th>
                         <th>{{ this.texts.dialog_highscore_name }}</th>
                         <th>{{ this.alliance_ranking ? this.texts.dialog_alliance_member : this.texts.dialog_alliance_name_default }}</th>
-                        <th v-if="this.hasPoints">{{ this.texts.points_noValue }}</th>
+                        <th class="small_column" v-if="this.hasPoints">{{ this.texts.points_noValue }}</th>
+                        <th v-if="this.hasMedals && !this.alliance_ranking">{{ this.texts.dialog_fame_rankTitle }}</th>
+                        <th v-if="this.hasMedals">{{ this.texts.dialog_seasonLeague_medalsOverviewDialog_header }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,11 +95,20 @@ const app = Vue.createApp({
                         <td>{{ this.alliance_ranking ? player[this.offset(2)][1] : player[this.offset(2)].N }}</td>
                         <td>{{ this.alliance_ranking ? player[this.offset(2)][2] : player[this.offset(2)].AN }}</td>
                         <td v-if="this.hasPoints">&lrm;{{ this.formatNumber(player[this.offset(1)]) }}</td>
+                        <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + player[this.offset(2)].KLRID]">
+                            <img :src="'assets/title_' + player[this.offset(2)].KLRID >> 2 + '.png'" alt="title"/>
+                            <img v-if="player[this.offset(2)].KLRID % 4 != 1" :src="'assets/title_level_' + (player[this.offset(2)].KLRID - 1) % 4  + '.png'" alt="title level"/>
+                        </td>
+                        <td v-if="this.hasMedals" class="medal">
+                            <div><p>{{ this.nbMedals(player, 1) }}</p><img src="assets/medal_gold.png" alt="gold medal"/></div>
+                            <div v-if="this.nbMedals(player, 2) > 0"><p>{{ this.nbMedals(player, 2) }}</p><img src="assets/medal_silver.png" alt="silver medal"/></div>
+                            <div v-if="this.nbMedals(player, 3) > 0"><p>{{ this.nbMedals(player, 3) }}</p><img src="assets/medal_bronze.png" alt="bronze medal"/></div>
+                        </td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td id="search" colspan="4">
+                        <td id="search" colspan="10">
                             <div>
                                 <input id="search_input" :placeholder="this.texts.dialog_highscore_search" @keydown.enter="this.search"/>
                                 <button @click="this.search"><img src="assets/search.svg" alt="search"/></button>
@@ -178,13 +197,13 @@ const app = Vue.createApp({
         },
 
         async nextPage() {
-            this.current_search = this.players[~~((this.players.length - 1) / 2)][this.offset(0)] + this.players.length;
+            this.current_search = this.players[(this.players.length - 1) >> 1][this.offset(0)] + this.players.length;
             await this.getPlayers();
         },
 
         async previousPage() {
             if (this.players[0][this.offset(0)] >= this.players.length) {
-                this.current_search = this.players[~~((this.players.length - 1) / 2)][this.offset(0)] - this.players.length;
+                this.current_search = this.players[(this.players.length - 1) >> 1][this.offset(0)] - this.players.length;
             }
             else {
                 this.current_search = 1;
@@ -236,7 +255,9 @@ const app = Vue.createApp({
 
         async toggleAllianceRanking() {
             this.alliance_ranking = !this.alliance_ranking;
-            this.current_event_name = Object.keys(this.eventsList)[0];
+            if (!(current_event_name in this.eventsList)) {
+                this.current_event_name = Object.keys(this.eventsList)[0];
+            }
             this.current_category_index = 0;
             this.current_search = 1;
             await this.getPlayers();
@@ -244,11 +265,15 @@ const app = Vue.createApp({
 
         offset(index) {
             if (this.currentEvent != null) {
-                return index + (this.currentEvent.offset || 0) - (index >= 2 ? this.currentEvent.nopoints || 0 : 0);
+                return index + (this.currentEvent.offset ?? 0) - (index >= 2 ? this.currentEvent.nopoints ?? 0 : 0);
             }
             else {
                 return index;
             }
+        },
+
+        nbMedals(player, type) {
+            return player[this.offset(2 + alliance_ranking)].KLMO.filter(medal => medal[0] == type)[0][1];
         }
     },
 
@@ -302,11 +327,19 @@ const app = Vue.createApp({
         },
 
         hasPoints() {
-            if (this.currentCategory == null) {
+            if (this.currentEvent == null) {
                 return true;
             }
             else {
-                return !this.currentEvent.nopoints;
+                return !this.currentEvent.nopoints && !this.currentEvent.isLeague;
+            }
+        },
+        hasMedals() {
+            if (this.currentEvent == null) {
+                return false;
+            }
+            else {
+                return this.currentEvent.isLeague;
             }
         }
     }

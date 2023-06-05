@@ -328,6 +328,16 @@
                 }
             ]
         },
+        "event_title_601": {
+            "id": 63,
+            "isLeague": true,
+            "categories": [
+                {
+                    "id": 1,
+                    "value": "tous"
+                }
+            ]    
+        },
         "event_title_89": {
             "id": 72,
             "categories": [
@@ -421,6 +431,16 @@
                 }
             ]
         },
+        "event_title_601": {
+            "id": 67,
+            "isLeague": true,
+            "categories": [
+                {
+                    "id": 1,
+                    "value": "tous"
+                }
+            ]    
+        },
         "event_title_113": {
             "id": 77,
             "categories": [
@@ -429,30 +449,6 @@
                     "value": "tous"
                 }
             ]
-        }
-    },
-    "others": {
-        "player": {
-            "event_title_601": {
-                "id": 63,
-                "categories": [
-                    {
-                        "id": 1,
-                        "value": "tous"
-                    }
-                ]    
-            }
-        },
-        "alliance": {
-            "event_title_601": {
-                "id": 67,
-                "categories": [
-                    {
-                        "id": 1,
-                        "value": "tous"
-                    }
-                ]    
-            }
         }
     }
 }
