@@ -96,7 +96,7 @@ const app = Vue.createApp({
                         <td>{{ this.alliance_ranking ? player[this.offset(2)][2] : player[this.offset(2)].AN }}</td>
                         <td v-if="this.hasPoints">&lrm;{{ this.formatNumber(player[this.offset(1)]) }}</td>
                         <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + player[this.offset(2)].KLRID]">
-                            <img :src="'assets/title_' + player[this.offset(2)].KLRID >> 2 + '.png'" alt="title"/>
+                            <img :src="'assets/title_' + (player[this.offset(2)].KLRID >> 2) + '.png'" alt="title"/>
                             <img v-if="player[this.offset(2)].KLRID % 4 != 1" :src="'assets/title_level_' + (player[this.offset(2)].KLRID - 1) % 4  + '.png'" alt="title level"/>
                         </td>
                         <td v-if="this.hasMedals" class="medal">
@@ -273,7 +273,12 @@ const app = Vue.createApp({
         },
 
         nbMedals(player, type) {
-            return player[this.offset(2 + this.alliance_ranking)].KLMO.filter(medal => medal[0] == type)[0][1];
+            if ("KLMO" in player[this.offset(2 + this.alliance_ranking)]) {
+                return player[this.offset(2 + this.alliance_ranking)].KLMO.filter(medal => medal[0] == type)[0][1];
+            }
+            else {
+                return 0;
+            }
         }
     },
 
