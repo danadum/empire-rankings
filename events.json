@@ -470,6 +470,15 @@
                 }
             ]
         },
+        "dialog_redAlienInvasion_message_header": {
+            "id": 59,
+            "categories": [
+                {
+                    "id": 1,
+                    "value": "tous"
+                }
+            ]
+        },
         "event_title_601": {
             "id": 67,
             "isLeague": true,
