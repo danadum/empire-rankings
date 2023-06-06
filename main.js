@@ -145,7 +145,7 @@ const app = Vue.createApp({
         },
 
         async getPlayers() {
-            const response = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22LID%22:${this.currentCategory.id},%22SV%22:%22${this.current_search}%22`);
+            const response = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22LID%22:${this.currentCategory.id},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`);
             const jsonData = await response.json();
             if (jsonData.return_code == "0") {
                 this.players = jsonData.content.L;
