@@ -110,11 +110,11 @@ body, html {
 }
 
 #table col {
-    width: 30%;
+    width: 150%;
 }
 
 #table col.small_column {
-    width: 20%;
+    width: 100%;
 }
 
 

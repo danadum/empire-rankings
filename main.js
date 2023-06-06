@@ -92,12 +92,12 @@ const app = Vue.createApp({
                 <tbody>
                     <tr v-for="player in this.players">
                         <td>&lrm;{{ this.formatNumber(player[this.offset(0)]) }}</td>
-                        <td>{{ this.alliance_ranking ? player[this.offset(2)][1] : player[this.offset(2)].N }}</td>
-                        <td>{{ this.alliance_ranking ? player[this.offset(2)][2] : player[this.offset(2)].AN }}</td>
+                        <td>{{ (player[this.offset(2)] ?? {})[this.alliance_ranking ? 1 : 'N'] }}</td>
+                        <td>{{ (player[this.offset(2)] ?? {})[this.alliance_ranking ? 2 : 'AN'] }}</td>
                         <td v-if="this.hasPoints">&lrm;{{ this.formatNumber(player[this.offset(1)]) }}</td>
-                        <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + player[this.offset(2)].KLRID]">
-                            <img :src="'assets/title_' + (player[this.offset(2)].KLRID >> 2) + '.png'" alt="title"/>
-                            <img v-if="(player[this.offset(2)].KLRID || 1) % 4 != 1" :src="'assets/title_level_' + (player[this.offset(2)].KLRID - 1) % 4  + '.png'" alt="title level"/>
+                        <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + (player[this.offset(2)] ?? {}).KLRID]">
+                            <img :src="'assets/title_' + ((player[this.offset(2)] ?? {}).KLRID >> 2) + '.png'" alt="title"/>
+                            <img v-if="((player[this.offset(2)] ?? {}).KLRID ?? 1) % 4 != 1" :src="'assets/title_level_' + ((player[this.offset(2)] ?? {}).KLRID - 1) % 4  + '.png'" alt="title level"/>
                         </td>
                         <td v-if="this.hasMedals" class="medal">
                             <div><p>{{ this.nbMedals(player, 1) }}</p><img src="assets/medal_gold.png" alt="gold medal"/></div>
