@@ -164,13 +164,43 @@
                 }
             ]
         },
+        "event_title_71": {
+            "id": 44,
+            "categories": [
+                {
+                    "id": 1,
+                    "name": "level_placeholder",
+                    "value": "20-69"
+                },
+                {
+                    "id": 2,
+                    "name": "legendaryLevel_placeholder",
+                    "value": "1-299"
+                },
+                {
+                    "id": 3,
+                    "name": "legendaryLevel_placeholder",
+                    "value": "300-649"
+                },
+                {
+                    "id": 4,
+                    "name": "legendaryLevel_placeholder",
+                    "value": "650-949"
+                },
+                {
+                    "id": 5,
+                    "name": "legendaryLevel_placeholder",
+                    "value": "950"
+                }
+            ]
+        },
         "event_title_72": {
             "id": 46,
             "categories": [
                 {
                     "id": 1,
                     "name": "level_placeholder",
-                    "value": "40-69"
+                    "value": "30-69"
                 },
                 {
                     "id": 2,
@@ -200,7 +230,7 @@
                 {
                     "id": 1,
                     "name": "level_placeholder",
-                    "value": "40-69"
+                    "value": "10-69"
                 },
                 {
                     "id": 2,
@@ -397,6 +427,15 @@
         "cargo_points": {
             "id": 13,
             "offset": 1,
+            "categories": [
+                {
+                    "id": 1,
+                    "value": "tous"
+                }
+            ]
+        },
+        "event_title_71": {
+            "id": 45,
             "categories": [
                 {
                     "id": 1,
