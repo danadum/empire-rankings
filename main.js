@@ -182,7 +182,7 @@ const app = Vue.createApp({
                 this.players = players;
             }
             else {
-                alert(this.texts.alert_playerName_notFound)
+                alert(this.alliance_ranking ? alert_allianceName_notFound : this.texts.alert_playerName_notFound)
             }
         },
 
