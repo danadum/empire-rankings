@@ -22,9 +22,8 @@ const app = Vue.createApp({
         await this.changeLanguage();
 
         let sockets_file = await fetch(`${this.proxy}https://empire-html5.goodgamestudios.com/config/network/1.xml`);
-        sockets_file = await sockets_file.text();
-        sockets_file = new DOMParser().parseFromString(sockets_file, 'text/xml');
-        for (instance of sockets_file.children[0].children[0].children) {
+        sockets_file = new DOMParser().parseFromString(await sockets_file.text(), 'text/xml');
+        for (let instance of sockets_file.firstChild.firstChild.children) {
             if (instance.children[2].textContent != "EmpireEx_23") {
                 this.servers[instance.children[2].textContent] = {
                     name: instance.children[6].textContent,
@@ -36,7 +35,7 @@ const app = Vue.createApp({
         const response = await fetch("events.json");
         this.events = await response.json();
         this.current_event_name = Object.keys(this.eventsList)[0];
-        await this.getPlayers();
+        await this.getRankingsByRank();
     },
 
     template:
@@ -44,16 +43,15 @@ const app = Vue.createApp({
     `
     <section :style="{direction: this.current_language == 'ar' ? 'rtl' : 'ltr'}">
         <select id="servers" v-model="this.current_server_header" @change="changeServer">
-            <option v-for="[header, server] in Object.entries(this.servers)" :value="header" select>{{ this.texts[server.name] + " " + server.id }}</option>
+            <option v-for="(server, key) in this.servers" :value="key" :key="key">{{ this.texts[server.name] + " " + server.id }}</option>
         </select>
         <div id="alliance_toggle">
             <button @click="this.toggleAllianceRanking" :class="[this.alliance_ranking ? '' : 'active']">{{ this.texts.player }}</button>
             <button @click="this.toggleAllianceRanking" :class="[this.alliance_ranking ? 'active' : '']">{{ this.texts.dialog_alliance_name_default }}</button>
         </div>
         <select id="events" v-model="this.current_event_name" @change="changeEvent">
-            <option v-for="event in Object.keys(this.eventsList)" :value="event" select>{{ this.texts[event] }}</option>
+            <option v-for="(event, key) in this.eventsList" :value="key" :key="key">{{ this.texts[key] }}</option>
         </select>
-
         <div id="content">
             <div id="navigate_buttons">
                 <button @click="this.firstPage"><img src="assets/double_arrow_up.svg" alt="first page"/></button>
@@ -90,14 +88,14 @@ const app = Vue.createApp({
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="player in this.players">
+                    <tr v-for="(player, index) in this.players" :key="index">
                         <td>&lrm;{{ this.formatNumber(player[this.offset(0)]) }}</td>
-                        <td>{{ (player[this.offset(2)] ?? {})[this.alliance_ranking ? 1 : 'N'] }}</td>
-                        <td>{{ (player[this.offset(2)] ?? {})[this.alliance_ranking ? 2 : 'AN'] }}</td>
+                        <td>{{ player[this.offset(2)]?.[this.alliance_ranking ? 1 : 'N'] }}</td>
+                        <td>{{ player[this.offset(2)]?.[this.alliance_ranking ? 2 : 'AN'] }}</td>
                         <td v-if="this.hasPoints">&lrm;{{ this.formatNumber(player[this.offset(1)]) }}</td>
-                        <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + (player[this.offset(2)] ?? {}).KLRID]">
-                            <img :src="'assets/title_' + ((player[this.offset(2)] ?? {}).KLRID >> 2) + '.png'" alt="title"/>
-                            <img v-if="((player[this.offset(2)] ?? {}).KLRID ?? 1) % 4 != 1" :src="'assets/title_level_' + ((player[this.offset(2)] ?? {}).KLRID - 1) % 4  + '.png'" alt="title level"/>
+                        <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + player[this.offset(2)]?.KLRID]">
+                            <img :src="'assets/title_' + (player[this.offset(2)]?.KLRID >> 2) + '.png'" alt="title"/>
+                            <img v-if="(player[this.offset(2)]?.KLRID ?? 1) % 4 != 1" :src="'assets/title_level_' + (player[this.offset(2)].KLRID - 1) % 4  + '.png'" alt="title level"/>
                         </td>
                         <td v-if="this.hasMedals" class="medal">
                             <div><p>{{ this.nbMedals(player, 1) }}</p><img src="assets/medal_gold.png" alt="gold medal"/></div>
@@ -119,9 +117,9 @@ const app = Vue.createApp({
             </table>
         </div>
         <select id="languages" v-model="this.current_language" @change="changeLanguage">
-            <option v-for="language in languages" :value="language" select>{{ this.texts["language_native_" + language.toLowerCase()] }}</option>
+            <option v-for="language in languages" :value="language" :key="language">{{ this.texts["language_native_" + language.toLowerCase()] }}</option>
         </select>
-        </section>
+    </section>
     `,
 
     methods: {
@@ -144,7 +142,7 @@ const app = Vue.createApp({
             Object.assign(this.texts, await texts_file.json());    
         },
 
-        async getPlayers() {
+        async getRankingsByRank() {
             const response = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22LID%22:${this.currentCategory.id},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`);
             const jsonData = await response.json();
             if (jsonData.return_code == "0") {
@@ -157,7 +155,7 @@ const app = Vue.createApp({
             }
         },
 
-        async getPlayersByName() {
+        async getRankingsByName() {
             const response = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`);
             const jsonData = await response.json();
             let players;
@@ -170,15 +168,7 @@ const app = Vue.createApp({
                 this.last_rank = 1;
             }
             if (players.length != 0) {
-                if (this.currentEvent.id != undefined) {
-                    this.current_category_index = this.currentEvent.categories.indexOf(this.currentEvent.categories.find(category => category.id == jsonData.content.LID));                
-                }
-                else {
-                    this.current_category_index = this.currentEvent.categories.indexOf(this.currentEvent.categories.find(category => category.eventid == jsonData.content.LT && category.id == jsonData.content.LID));                
-                }
-                if (this.current_category_index == -1) {
-                    this.current_category_index = 0;
-                }
+                this.current_category_index = Math.max(0, this.categoriesList.findIndex(category => category.eventid == this.currentCategory.eventid && category.id == jsonData.content.LID));
                 this.players = players;
             }
             else {
@@ -186,71 +176,9 @@ const app = Vue.createApp({
             }
         },
 
-        async lastPage() {
-            this.current_search = this.last_rank;
-            await this.getPlayers();
-        },
-
-        async firstPage() {
-            this.current_search = 1;
-            await this.getPlayers();
-        },
-
-        async nextPage() {
-            this.current_search = this.players[(this.players.length - 1) >> 1][this.offset(0)] + this.players.length;
-            await this.getPlayers();
-        },
-
-        async previousPage() {
-            if (this.players[0][this.offset(0)] >= this.players.length) {
-                this.current_search = this.players[(this.players.length - 1) >> 1][this.offset(0)] - this.players.length;
-            }
-            else {
-                this.current_search = 1;
-            }
-            await this.getPlayers();
-        },
-
-        async nextCategory() {
-            this.current_category_index = (this.current_category_index + 1) % this.nbCategories;
-            this.current_search = 1;
-            await this.getPlayers();
-        },
-
-        async previousCategory() {
-            this.current_category_index = (this.current_category_index - 1 + this.nbCategories) % this.nbCategories;
-            this.current_search = 1;
-            await this.getPlayers();
-        },
-
-        async changeEvent() {
-            this.current_category_index = 0;
-            this.current_search = 1;
-            await this.getPlayers();
-        },
-
         async changeServer() {
             this.current_search = 1;
-            await this.getPlayers();
-        },
-
-        async search() {
-            if (document.getElementById('search_input').value != "") {
-                this.current_search = document.getElementById('search_input').value;
-                if (/^-?[0-9]+$/.test(this.current_search)) {
-                    if (+this.current_search <= 0) {
-                        this.current_search = 1;
-                    }
-                    await this.getPlayers();
-                }
-                else {
-                    await this.getPlayersByName();
-                }
-            }
-        },
-
-        formatNumber(number) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+            await this.getRankingsByRank();
         },
 
         async toggleAllianceRanking() {
@@ -260,93 +188,106 @@ const app = Vue.createApp({
             }
             this.current_category_index = 0;
             this.current_search = 1;
-            await this.getPlayers();
+            await this.getRankingsByRank();
+        },
+
+        async changeEvent() {
+            this.current_category_index = 0;
+            this.current_search = 1;
+            await this.getRankingsByRank();
+        },
+
+        async previousCategory() {
+            this.current_category_index = (this.current_category_index + this.nbCategories - 1) % this.nbCategories;
+            this.current_search = 1;
+            await this.getRankingsByRank();
+        },
+
+        async nextCategory() {
+            this.current_category_index = (this.current_category_index + 1) % this.nbCategories;
+            this.current_search = 1;
+            await this.getRankingsByRank();
+        },
+
+        async firstPage() {
+            this.current_search = 1;
+            await this.getRankingsByRank();
+        },
+
+        async lastPage() {
+            this.current_search = this.last_rank;
+            await this.getRankingsByRank();
+        },
+
+        async previousPage() {
+            this.current_search = Math.max(1, this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] - this.players.length || 1);
+            await this.getRankingsByRank();
+        },
+
+        async nextPage() {
+            this.current_search = this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] + this.players.length || 1;
+            await this.getRankingsByRank();
+        },
+
+        async search() {
+            if (document.getElementById('search_input').value != "") {
+                this.current_search = document.getElementById('search_input').value;
+                if (/^-?[0-9]+$/.test(this.current_search)) {
+                    if (+this.current_search <= 0) {
+                        this.current_search = 1;
+                    }
+                    await this.getRankingsByRank();
+                }
+                else {
+                    await this.getRankingsByName();
+                }
+            }
+        },
+
+        formatNumber(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
         },
 
         offset(index) {
-            if (this.currentEvent != null) {
-                return index + (this.currentEvent.offset ?? 0) - (index >= 2 ? this.currentEvent.nopoints ?? 0 : 0);
-            }
-            else {
-                return index;
-            }
+            return index + (this.currentEvent.offset ?? 0) - (index >= 2 ? this.currentEvent.nopoints ?? 0 : 0);
         },
 
         nbMedals(player, type) {
-            let player_data = player[this.offset(2 + this.alliance_ranking)];
-            if (player_data instanceof Object && "KLMO" in player_data) {
-                return player_data.KLMO.find(medal => medal[0] == type)[1];
-            }
-            else {
-                return 0;
-            }
+            return player[this.offset(2 + this.alliance_ranking)]?.KLMO?.find(medal => medal[0] == type)?.[1] ?? 0;
         }
     },
 
     computed: {
         eventsList() {
-            if (Object.keys(this.events).length != 0) {
-                return this.events[this.alliance_ranking ? "alliance" : "player"];
-            }
-            else {
-                return {};
-            }
+            return this.events[this.alliance_ranking ? "alliance" : "player"] ?? {};
         },
 
         currentEvent() {
-            if (this.current_event_name != '') {
-                return this.eventsList[this.current_event_name];
-            }
-            else {
-                return null;
-            }
+            return this.eventsList[this.current_event_name] ?? {};
         },
 
         currentEventId() {
-            if (this.currentCategory.eventid == undefined) {
-                return this.currentEvent.id;
-            }
-            else {
-                return this.currentCategory.eventid;
-            }
+            return this.currentCategory.eventid ?? this.currentEvent.id; 
+        },
+
+        categoriesList() {
+            return this.currentEvent.categories ?? [];
         },
 
         currentCategory() {
-            if (this.currentEvent != null) {
-                if (this.current_category_index < this.nbCategories) {
-                    return this.currentEvent.categories[this.current_category_index];
-                }
-                return this.currentEvent.categories[0];
-            }
-            else {
-                return null;
-            }
+            return this.categoriesList[this.current_category_index] ?? this.categoriesList[0] ?? {};
         },
 
         nbCategories() {
-            if (this.currentEvent != null) {
-                return this.currentEvent.categories.length;
-            }
-            else {
-                return 0;
-            }
+            return this.categoriesList.length ?? 0;
         },
 
         hasPoints() {
-            if (this.currentEvent == null) {
-                return true;
-            }
-            else {
-                return !this.currentEvent.nopoints && !this.currentEvent.isLeague;
-            }
+            return !this.currentEvent.nopoints && !this.currentEvent.isLeague;
         },
+
         hasMedals() {
-            if (this.currentEvent == null) {
-                return false;
-            }
-            else {
-                return this.currentEvent.isLeague;
-            }
+            return !!this.currentEvent.isLeague;
         }
     }
 });
