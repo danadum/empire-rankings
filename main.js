@@ -63,7 +63,7 @@ const app = Vue.createApp({
                 <colgroup>
                     <col class="small_column">
                     <col>
-                    <col>
+                    <col v-if="!this.currentCategory.isCurrentOuter">
                     <col class="small_column" v-if="this.hasPoints">
                     <col class="small_column" v-if="this.hasMedals && !this.alliance_ranking">
                     <col v-if="this.hasMedals">
@@ -81,7 +81,7 @@ const app = Vue.createApp({
                     <tr>
                         <th class="small_column">{{ this.texts.rank }}</th>
                         <th>{{ this.texts.dialog_highscore_name }}</th>
-                        <th>{{ this.alliance_ranking ? this.texts.dialog_alliance_member : this.texts.dialog_alliance_name_default }}</th>
+                        <th v-if="!this.currentCategory.isCurrentOuter">{{ this.alliance_ranking ? this.texts.dialog_alliance_member : this.texts.dialog_alliance_name_default }}</th>
                         <th class="small_column" v-if="this.hasPoints">{{ this.texts.points_noValue }}</th>
                         <th v-if="this.hasMedals && !this.alliance_ranking">{{ this.texts.dialog_fame_rankTitle }}</th>
                         <th v-if="this.hasMedals">{{ this.texts.dialog_seasonLeague_medalsOverviewDialog_header }}</th>
@@ -89,9 +89,9 @@ const app = Vue.createApp({
                 </thead>
                 <tbody>
                     <tr v-for="(player, index) in this.players" :key="index">
-                        <td>&lrm;{{ this.formatNumber(player[this.offset(0)]) }}</td>
-                        <td>{{ player[this.offset(2)]?.[this.alliance_ranking ? 1 : 'N'] }}</td>
-                        <td>{{ player[this.offset(2)]?.[this.alliance_ranking ? 2 : 'AN'] }}</td>
+                        <td>&lrm;{{ this.currentCategory.isCurrentOuter ? player[this.offset(4)] : this.formatNumber(player[this.offset(0)]) }}</td>
+                        <td>{{ this.currentCategory.isCurrentOuter ? player[this.offset(3)] : player[this.offset(2)]?.[this.alliance_ranking ? 1 : 'N'] }}</td>
+                        <td v-if="!this.currentCategory.isCurrentOuter">{{ player[this.offset(2)]?.[this.alliance_ranking ? 2 : 'AN'] }}</td>
                         <td v-if="this.hasPoints">&lrm;{{ this.formatNumber(player[this.offset(1)]) }}</td>
                         <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + player[this.offset(2)]?.KLRID]">
                             <img :src="'assets/title_' + (player[this.offset(2)]?.KLRID - 1 >> 2) + '.png'" alt="title"/>

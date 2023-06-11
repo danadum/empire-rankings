@@ -389,7 +389,8 @@
                     "id": 1,
                     "name": "currentEvent",
                     "placeholder": ":",
-                    "value": ""
+                    "value": "",
+                    "isCurrentOuter": true
                 }
             ]
         },
