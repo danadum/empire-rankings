@@ -40,7 +40,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -354,7 +354,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -364,7 +364,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]    
         },
@@ -373,16 +373,23 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
         "temp_server_name": {
-            "id": 76,
             "categories": [
                 {
+                    "eventid": 76,
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_combinedReward_eventOver"
+                },
+                {
+                    "eventid": 62,
+                    "id": 1,
+                    "name": "currentEvent",
+                    "placeholder": ":",
+                    "value": ""
                 }
             ]
         },
@@ -391,7 +398,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         }
@@ -402,7 +409,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -411,7 +418,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -420,7 +427,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -430,7 +437,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -439,7 +446,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -448,7 +455,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -457,7 +464,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -466,7 +473,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -475,7 +482,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         },
@@ -485,7 +492,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]    
         },
@@ -494,7 +501,7 @@
             "categories": [
                 {
                     "id": 1,
-                    "value": "tous"
+                    "name": "dialog_ci_filter01_all"
                 }
             ]
         }

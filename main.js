@@ -73,7 +73,7 @@ const app = Vue.createApp({
                         <th id="category" colspan="10">
                             <div>
                                 <button @click="this.previousCategory"><img src="assets/arrow_up.svg" alt="next category" :class="this.current_language == 'ar' ? 'rightArrow' : 'leftArrow'"/></button>
-                                <p> {{ this.texts[this.currentCategory.name].replace(this.currentCategory.placeholder ?? '{0}', this.currentCategory.value) }}</p>
+                                <p> {{ this.texts[this.currentCategory.name].replace(this.currentCategory.placeholder ?? '{0}', this.currentCategory.value).trim().replace(/ +/g, ' ') }}</p>
                                 <button @click="this.nextCategory"><img src="assets/arrow_up.svg" alt="previous category" :class="this.current_language == 'ar' ? 'leftArrow' : 'rightArrow'"/></button>
                             </div>                   
                         </th>
@@ -94,7 +94,7 @@ const app = Vue.createApp({
                         <td>{{ player[this.offset(2)]?.[this.alliance_ranking ? 2 : 'AN'] }}</td>
                         <td v-if="this.hasPoints">&lrm;{{ this.formatNumber(player[this.offset(1)]) }}</td>
                         <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + player[this.offset(2)]?.KLRID]">
-                            <img :src="'assets/title_' + (player[this.offset(2)]?.KLRID >> 2) + '.png'" alt="title"/>
+                            <img :src="'assets/title_' + (player[this.offset(2)]?.KLRID - 1 >> 2) + '.png'" alt="title"/>
                             <img v-if="(player[this.offset(2)]?.KLRID ?? 1) % 4 != 1" :src="'assets/title_level_' + (player[this.offset(2)].KLRID - 1) % 4  + '.png'" alt="title level"/>
                         </td>
                         <td v-if="this.hasMedals" class="medal">
@@ -168,7 +168,7 @@ const app = Vue.createApp({
                 this.last_rank = 1;
             }
             if (players.length != 0) {
-                this.current_category_index = Math.max(0, this.categoriesList.findIndex(category => category.eventid == this.currentCategory.eventid && category.id == jsonData.content.LID));
+                this.current_category_index = Math.max(0, this.currentEvent.categories.findIndex(category => category.eventid == this.currentCategory.eventid && category.id == jsonData.content.LID));
                 this.players = players;
             }
             else {
@@ -270,16 +270,12 @@ const app = Vue.createApp({
             return this.currentCategory.eventid ?? this.currentEvent.id; 
         },
 
-        categoriesList() {
-            return this.currentEvent.categories ?? [];
-        },
-
         currentCategory() {
-            return this.categoriesList[this.current_category_index] ?? this.categoriesList[0] ?? {};
+            return this.currentEvent.categories?.[this.current_category_index] ?? this.currentEvent.categories?.[0] ?? {};
         },
 
         nbCategories() {
-            return this.categoriesList.length ?? 0;
+            return this.currentEvent.categories?.length ?? 0;
         },
 
         hasPoints() {
