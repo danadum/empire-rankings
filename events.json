@@ -124,6 +124,27 @@
                 }
             ]
         },
+        "event_title_3": {
+            "eventid": 30,
+            "categories": [
+                {
+                    "id": 1,
+                    "name": "dialog_factionhighscore_blueList"
+                },
+                {
+                    "id": 2,
+                    "name": "dialog_factionhighscore_redList"
+                },
+                {
+                    "id": 3,
+                    "name": "dialog_factionhighscore_blueList_legendary"
+                },
+                {
+                    "id": 4,
+                    "name": "dialog_factionhighscore_redList_legendary"
+                }
+            ]
+        },
         "event_title_60": {
             "id": 40,
             "categories": [
