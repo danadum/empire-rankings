@@ -34,7 +34,7 @@ const app = Vue.createApp({
                 };
             }
         }
-        if (window.localStorage.getItem('server') in servers) {
+        if (window.localStorage.getItem('server') in this.servers) {
             this.current_server_header = window.localStorage.getItem('server');
         }
         const response = await fetch("events.json");
@@ -140,15 +140,17 @@ const app = Vue.createApp({
         async getLanguages() {
             let languages_file = await fetch (`${this.proxy}https://empire-html5.goodgamestudios.com/config/languages/version.json`)
             languages_file = await languages_file.json();
+            let requests = [];
             for (let language in languages_file.languages) {
                 if (language != "") {
-                    fetch(`https://langserv.public.ggs-ep.com/em@${languages_file.languages[language]}/${language}/@metadata`).then(response => {
+                    requests.push(fetch(`https://langserv.public.ggs-ep.com/em@${languages_file.languages[language]}/${language}/@metadata`).then(response => {
                         if (response.ok) {
                             this.languages.push(language);
                         }
-                    });
+                    }));
                 }
             }
+            await Promise.all(requests);
         },
 
         async changeLanguage() {
