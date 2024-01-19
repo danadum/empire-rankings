@@ -9,16 +9,19 @@ const app = Vue.createApp({
             players: [],
             current_language: 'fr',
             current_server_header: 'EmpireEx_3',
-            current_event_name: '',
-            current_category_index: 0,
-            current_search: 1,
+            current_event_name: window.sessionStorage.getItem('event') ?? '',
+            current_category_index: window.sessionStorage.getItem('category') ?? 0,
+            current_search: window.sessionStorage.getItem('search') ??  1,
             last_rank: 1,
-            alliance_ranking: false
+            alliance_ranking: !!window.sessionStorage.getItem('alliance') ?? false
         }
     },
 
     async mounted() {
         await this.getLanguages();
+        if (this.languages.include(window.localStorage.getItem('language'))) {
+            this.current_language = window.localStorage.getItem('language');
+        }
         await this.changeLanguage();
 
         let sockets_file = await fetch(`${this.proxy}https://empire-html5.goodgamestudios.com/config/network/1.xml`);
@@ -31,10 +34,21 @@ const app = Vue.createApp({
                 };
             }
         }
-
+        if (window.localStorage.getItem('server') in servers) {
+            this.current_server_header = window.localStorage.getItem('server');
+        }
         const response = await fetch("events.json");
         this.events = await response.json();
-        this.current_event_name = Object.keys(this.eventsList)[0];
+        if (!Object.keys(this.eventsList).includes(this.current_event_name)) {
+            this.current_event_name = Object.keys(this.eventsList)[0];
+            this.current_category_index = 0;
+            this.current_search = 1;
+        }
+        if (this.current_category_index > this.nbCategories) {
+            this.current_category_index = 0;
+            this.current_search = 1;
+        }
+
         await this.getRankingsByRank();
     },
 
@@ -285,5 +299,26 @@ const app = Vue.createApp({
         hasMedals() {
             return !!this.currentEvent.isLeague;
         }
+    },
+
+    watch: {
+        current_language(newValue, oldValue) {
+            window.localStorage.setItem('language', newValue);
+        },
+        current_server_header(newValue, oldValue) {
+            window.localStorage.setItem('server', newValue);
+        },
+        current_event_name(newValue, oldValue) {
+            window.sessionStorage.setItem('event', newValue);
+        },
+        current_category_index(newValue, oldValue) {
+            window.sessionStorage.setItem('category', newValue);
+        },
+        current_search(newValue, oldValue) {
+            window.sessionStorage.setItem('search', newValue);
+        },
+        alliance_ranking(newValue, oldValue) {
+            window.sessionStorage.setItem('alliance', newValue);
+        },    
     }
 });
