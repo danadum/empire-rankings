@@ -19,7 +19,7 @@ const app = Vue.createApp({
 
     async mounted() {
         await this.getLanguages();
-        if (this.languages.include(window.localStorage.getItem('language'))) {
+        if (this.languages.includes(window.localStorage.getItem('language'))) {
             this.current_language = window.localStorage.getItem('language');
         }
         await this.changeLanguage();
