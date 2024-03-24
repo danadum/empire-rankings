@@ -1,87 +1,225 @@
-body, html {
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+
+
+
+
+:root {
+    --themeC: #71FCAA;
+    --bgGrey: #2D2E32;
+    --fullDarkGrey: #191A1D;
+    --DarkGrey: #25262A;
+    --greyLight: #999999;
+    --wt: #ffffff;
+}
+
+/* custom scrollbar */
+
+/* width */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--greyLight);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--themeC);
+}
+
+
+/*  */
+
+* {
+    margin: 0;
+    padding: 0;
+    /* border: 0; */
+    outline: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+.flexc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+body,
+html {
+    background: var(--bgGrey);
+    color: var(--wt);
+
     margin: 0;
     padding: 0;
 }
 
 * {
-    font-family: 'Times New Roman', Times, serif !important;
+    /* font-family: 'Times New Roman', Times, serif !important; */
+    font-family: "Nunito", sans-serif !important;
 }
 
+a{
+    text-decoration: none;
+}
+
+.contentCreater{
+    /* background: var(--wt); */
+    /* background: #000000; */
+    position: absolute;
+    bottom: 10px;
+    right: 0px;
+    padding: 8px 20px;
+    color: #000000;
+    border-radius: 50px 0 0 50px;
+
+    /* box-shadow: inset 5px 2px 10px var(--DarkGrey) !important; */
+}
+
+.creater,  .creater strong{
+    font-family: 'Rajdhani', sans-serif !important;
+    letter-spacing: 0.5px;
+    word-spacing: -3px;
+    /* color: #ffffff !important; */
+    animation: changeColor 8s infinite alternate; /* Apply the animation */
+}
+
+.creater{
+    margin: 0 5px;
+}
+
+/* Define the keyframe animation */
+@keyframes changeColor {
+    0% { color: #9100ff; }
+    50% { color: #71FCAA; }
+    100% { color: #00e7ff; }
+}
+
+h1{
+    flex-direction: column-reverse;
+    position: relative;
+    padding: 20px 0 25px;
+    font-family: "Great Vibes", cursive !important;
+    font-weight: 100;
+    font-style: normal;
+    font-size: 2.5em;
+    text-align: center;
+    /* color: var(--themeC); */
+    color: #000000;
+    text-shadow: 0px 0px rgba(0, 0, 0, 0.5);
+    /* animation: changeColor 8s infinite alternate-reverse;  */
+}
+
+h1>img{
+    /* display: none; */
+    /* position: absolute; */
+    /* top: 20px; */
+    /* right: 20px; */
+    width: 200px;
+}
+
+.wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+}
+
+
+section{
+    margin: 0 20px;
+}
+
+
 #content {
-    margin: auto 0;
-    margin-inline: 0 2vw;
+    background: var(--fullDarkGrey);
     display: flex;
-    width: 98vw;
+    box-shadow: 0 0 1em rgba(0, 0, 0, 0.5);
 }
 
 #languages {
-    display: block;
+    background: #000000;
+    color: var(--greyLight);
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 3px;
+    width: 100px;
     text-align: center;
     margin: 0.83em auto;
+
+    border: 0;
+    border-radius: 50px;
+    cursor: pointer;
 }
 
-#servers, #events {
-    text-align: center;
-    font-weight: bold;
+
+.tableNavbar{
+    background: #000000;
+    justify-content: space-between;
+    margin: 10px 0 35px;
+    height: 50px;
+    box-shadow: 0 0 0.6em rgba(0, 0, 0, 0.5);
 }
 
-#servers, #events, #alliance_toggle {
-    display: block;
-    margin: 0.3em auto;
+#servers,
+#alliance_toggle,
+#events {
+    background-color: transparent;
+    width: fit-content;
+    height: 100%;
+    font-size: 1.2em;
+    color: var(--greyLight);
+    cursor: pointer;
+    border: 0;
 }
+
+#servers{
+    padding: 0.5em 1em;
+}
+
+select option {
+    background: #000000;
+    color: var(--greyLight);
+    border-radius: 0;
+    border: none;
+    outline: none;
+    scroll-behavior: smooth;
+    cursor: pointer;
+}
+
 
 #alliance_toggle {
     width: fit-content;
+    height: 100%;
+    border-radius: 50px
 }
 
 #alliance_toggle button {
-    font-size: 0.9em;
+    background-color: var(--DarkGrey);
+    font-size: 0.8em;
     padding: 0.5em 1em;
-    margin: 0;
+    width: fit-content;
+    height: 100%;
     cursor: pointer;
-    display: inline-block;
     border: none;
-    border-radius: 0;
-    background-color: #e0e1e2;
+    color: var(--greyLight);
     font-weight: bold;
 }
 
-#alliance_toggle button:first-child {
-    border-top-left-radius: 0.3em;
-    border-bottom-left-radius: 0.3em;
-}
-
-#alliance_toggle button:last-child {
-    border-top-right-radius: 0.3em;
-    border-bottom-right-radius: 0.3em;
-}
 
 #alliance_toggle button.active {
-    background-color: #21ba45;
-    color: #ffffff;
-}
-
-#servers {
-    font-size: 1.5em;
-}
-
-#events {
-    font-size: 1.2em;
-}
-
-#navigate_buttons {
-    min-width: 2.5em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#navigate_buttons button {
-    margin: 0.2em 0;
-}
-
-#navigate_buttons button:nth-child(3) {
-    margin-top: auto;
+    background-color: var(--themeC);
+    color: var(--DarkGrey);
 }
 
 #table {
@@ -89,24 +227,28 @@ body, html {
     table-layout: fixed;
     width: 100%;
     margin: auto;
-    color: #000000;
-    background-color: #f5f5f5;
-    box-shadow: 0 0 1em rgba(0, 0, 0, 0.5);
-    border-radius: 1em;
+    background-color: var(--fullDarkGrey);
+    color: var(--greyLight);
     border-collapse: collapse;
     text-align: center;
+}
+
+#table thead{
+    background: #000000;
+    border-radius:1em;
 }
 
 #table tr {
     border-bottom: 1px solid black;
 }
 
-#table th, #table td {
+#table th,
+#table td {
     word-break: break-word;
 }
 
 #table th {
-    padding: 0.5em 0.2em;
+    padding: 1em 0.2em;
 }
 
 #table col {
@@ -117,13 +259,32 @@ body, html {
     width: 100%;
 }
 
+#table tbody tr:nth-child(1) {
+    background: #9100ff;
+    color: #000000;
+}
+
+#table tbody tr:nth-child(2) {
+    background: #71FCAA;
+    color: #000000;
+}
+
+#table tbody tr:nth-child(3) {
+    background: #00e7ff;
+    color: #000000;
+}
 
 #table tfoot tr {
     border-bottom: none;
 }
 
+#table tbody td {
+    height: 1.8em;
+}
+
+
 #table td {
-    padding: 0.3em 0.1em;
+    padding: 0.5em 0.1em;
 }
 
 .title img {
@@ -144,21 +305,24 @@ body, html {
     margin-right: 0;
 }
 
-.medal p, .medal img {
+.medal p,
+.medal img {
     display: inline-block;
     margin: 0;
     vertical-align: middle;
 }
 
-#category div, #search div {
+#category div,
+#search div {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 #category p {
-    margin: 0 0.5em;
-    width: 13em;
+    margin: 10px 0.8em;
+    /* width: 10em; */
+    max-width: 250px;
 }
 
 #search input {
@@ -167,14 +331,56 @@ body, html {
     text-align: center;
 }
 
-#navigate button, #table button {
+#navigate_buttons {
+    background: #000000;
+    padding: 5px 0;
+    min-width: 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#navigate_buttons button {
+    background: var(--wt);
+    margin: 0.2em 0;
+    border: 2px var(--DarkGrey) solid !important;
+}
+
+#navigate_buttons button:nth-child(3) {
+    margin-top: auto;
+}
+
+#navigate_buttons button,
+#table button {
+    background: var(--wt);
     display: flex;
     align-items: center;
     justify-content: center;
     height: 1.7em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 50px;
+    border: 0;
+    cursor: pointer;
 }
 
-td img, button img {
+#category button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bgGrey);
+    width: 30px;
+    height: 30px;
+    border-radius: 50px;
+    border: 2px var(--DarkGrey) solid !important;
+    cursor: pointer;
+}
+
+td img,
+button img {
     height: 1em;
     margin: auto;
 }
@@ -187,15 +393,11 @@ td img, button img {
     transform: rotate(90deg);
 }
 
-#table tbody td {
-    height: 1.5em;
-}
-
 @media all and (orientation: portrait) {
     #table {
         font-size: 0.8em;
     }
-    
+
     #table tbody td {
         height: 2.25em;
     }
