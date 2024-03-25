@@ -2,9 +2,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
 
-
-
-
 :root {
     --themeC: #71FCAA;
     --bgGrey: #2D2E32;
@@ -57,7 +54,8 @@
 
 body,
 html {
-    background: var(--bgGrey);
+    background: url('./assets/bgpic.png'), var(--bgGrey) no-repeat;
+    background-size: contain;
     color: var(--wt);
 
     margin: 0;
@@ -74,16 +72,13 @@ a{
 }
 
 .contentCreater{
-    /* background: var(--wt); */
-    /* background: #000000; */
+    background: var(--bgGrey);
     position: absolute;
-    bottom: 10px;
+    bottom: 20px;
     right: 0px;
     padding: 8px 20px;
     color: #000000;
     border-radius: 50px 0 0 50px;
-
-    /* box-shadow: inset 5px 2px 10px var(--DarkGrey) !important; */
 }
 
 .creater,  .creater strong{
@@ -114,14 +109,12 @@ h1{
     font-style: normal;
     font-size: 2.5em;
     text-align: center;
-    /* color: var(--themeC); */
     color: #000000;
     text-shadow: 0px 0px rgba(0, 0, 0, 0.5);
-    /* animation: changeColor 8s infinite alternate-reverse;  */
 }
 
 h1>img{
-    width: 150px;
+    width: 200px;
 }
 
 .wrapper {
@@ -148,7 +141,7 @@ section{
     position: absolute;
     top: 20px;
     right: 20px;
-    padding: 3px;
+    padding: 5px;
     width: 100px;
     text-align: center;
     margin: 0.83em auto;
@@ -281,7 +274,6 @@ select option {
 
 #table td {
     padding: 0.2em 0.1em;
-    
 }
 
 .title img {
@@ -390,6 +382,42 @@ button img {
     transform: rotate(90deg);
 }
 
+
+.gradientBar {
+    position: absolute;
+    bottom: 0px;
+
+    background: linear-gradient(to left, #9100ff, #71FCAA, #00e7ff);
+    background-size: 400% 400%;
+
+    width: 100%;
+    height: 3px;
+
+    -webkit-animation: AnimationName 30s ease infinite;
+    -moz-animation: AnimationName 30s ease infinite;
+    animation: AnimationName 30s ease infinite;
+}
+
+@-webkit-keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-moz-keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+
+
+
+
 @media all and (orientation: portrait) {
     #table {
         font-size: 0.8em;
@@ -398,4 +426,34 @@ button img {
     #table tbody td {
         height: 2.25em;
     }
+}
+
+
+/* Media Query */
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width:481px),
+screen and (max-width: 600px) {
+
+    .tableNavbar{
+        flex-direction: column;
+        height: fit-content;
+    }
+    
+    #servers,
+    #alliance_toggle,
+    #events {
+        width: 100%;
+        height: 100%;
+        padding: 10px 8px;
+    }
+
+    #alliance_toggle{
+        width: 100%;
+        padding: 0;
+    } 
+
+    #alliance_toggle button{
+        width: 50%;
+    }      
 }

@@ -56,10 +56,13 @@ const app = Vue.createApp({
     /*html*/
     `
     <div class="wrapper">
+        <div class="gradientBar"></div>
         <div class="contentCreater flexc">Made by  <a class="creater" href="https://dasdebjeet.github.io"><strong>Debjeet</strong>Das.</a> (aka Grim.Reaper)</div>
-
-        <h1 class="flexc"><img src="./assets/logo.png"/></h1>
+        <h1 class="flexc"><img src="./assets/nlogo.png"/></h1>
         <section :style="{direction: this.current_language == 'ar' ? 'rtl' : 'ltr'}">
+            <select class="flexc" id="languages" v-model="this.current_language" @change="changeLanguage">
+                <option v-for="language in languages" :value="language" :key="language">{{ this.texts["language_native_" + language.toLowerCase()] }}</option>
+            </select>
 
             <div class="tableNavbar flexc">
                 <select id="servers" v-model="this.current_server_header" @change="changeServer">
@@ -136,9 +139,6 @@ const app = Vue.createApp({
                     </tfoot>
                 </table>
             </div>
-            <select class="flexc" id="languages" v-model="this.current_language" @change="changeLanguage">
-                <option v-for="language in languages" :value="language" :key="language">{{ this.texts["language_native_" + language.toLowerCase()] }}</option>
-            </select>
         </section>
     </div>
     `,
