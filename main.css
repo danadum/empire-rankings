@@ -121,11 +121,7 @@ h1{
 }
 
 h1>img{
-    /* display: none; */
-    /* position: absolute; */
-    /* top: 20px; */
-    /* right: 20px; */
-    width: 200px;
+    width: 150px;
 }
 
 .wrapper {
@@ -284,7 +280,7 @@ select option {
 
 
 #table td {
-    padding: 0.5em 0.1em;
+    padding: 0.2em 0.1em;
 }
 
 .title img {
