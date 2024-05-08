@@ -13,6 +13,10 @@ const app = Vue.createApp({
             current_category_index: window.sessionStorage.getItem('category') ?? 0,
             current_search: window.sessionStorage.getItem('search') ??  1,
             last_rank: 1,
+            alliance_id: null,
+            alliance_name: "",
+            alliance_players: [],
+            alliance_event: null,
             alliance_ranking: !!window.sessionStorage.getItem('alliance') ?? false
         }
     },
@@ -83,11 +87,11 @@ const app = Vue.createApp({
                     <col v-if="this.hasMedals">
                 </colgroup>
                 <thead>
-                    <tr v-if="this.nbCategories > 1">
+                    <tr v-if="this.nbCategories > 1 || this.current_category_index < 0">
                         <th id="category" colspan="10">
                             <div>
                                 <button @click="this.previousCategory"><img src="assets/arrow_up.svg" alt="next category" :class="this.current_language == 'ar' ? 'rightArrow' : 'leftArrow'"/></button>
-                                <p> {{ this.texts[this.currentCategory.name].replace(this.currentCategory.placeholder ?? '{0}', this.currentCategory.value).trim().replace(/ +/g, ' ') }}</p>
+                                <p> {{ this.current_category_index < 0 ? this.alliance_name : this.texts[this.currentCategory.name].replace(this.currentCategory.placeholder ?? '{0}', this.currentCategory.value).trim().replace(/ +/g, ' ') }}</p>
                                 <button @click="this.nextCategory"><img src="assets/arrow_up.svg" alt="previous category" :class="this.current_language == 'ar' ? 'leftArrow' : 'rightArrow'"/></button>
                             </div>                   
                         </th>
@@ -105,7 +109,13 @@ const app = Vue.createApp({
                     <tr v-for="(player, index) in this.players" :key="index">
                         <td>&lrm;{{ this.currentCategory.isCurrentOuter ? player[this.offset(4)] : this.formatNumber(player[this.offset(0)]) }}</td>
                         <td>{{ this.currentCategory.isCurrentOuter ? player[this.offset(3)] : player[this.offset(2)]?.[this.alliance_ranking ? 1 : 'N'] }}</td>
-                        <td v-if="!this.currentCategory.isCurrentOuter">{{ player[this.offset(2)]?.[this.alliance_ranking ? 2 : 'AN'] }}</td>
+                        <td v-if="!this.currentCategory.isCurrentOuter && this.alliance_ranking" class="members">
+                            <a @click="this.toggleAlliancePlayersRanking(player[this.offset(2)])">
+                                <p>{{ player[this.offset(2)]?.[2] }}</p>
+                                <img :src="'assets/view.svg'" alt="view"/>
+                            </a>
+                        </td>
+                        <td v-if="!this.currentCategory.isCurrentOuter && !this.alliance_ranking">{{ player[this.offset(2)]?.['AN']}}</td>
                         <td v-if="this.hasPoints">&lrm;{{ this.formatNumber(player[this.offset(1)]) }}</td>
                         <td v-if="this.hasMedals && !this.alliance_ranking" class="title" :title="this.texts['seasonLeague_rank_' + player[this.offset(2)]?.KLRID]">
                             <img :src="'assets/title_' + (player[this.offset(2)]?.KLRID - 1 >> 2) + '.png'" alt="title"/>
@@ -192,6 +202,46 @@ const app = Vue.createApp({
             }
         },
 
+        async getRankingsByAlliance(allianceID) {
+            if (this.alliance_id != allianceID || this.alliance_event != this.currentEventId) {
+                this.players = [];
+                let alliance = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/ain/%22AID%22:${allianceID}`);
+                alliance = await alliance.json();
+                if (alliance.return_code == "0") {
+                    this.alliance_name = alliance.content.A.N;
+                    let members = alliance.content.A.M;
+    
+                    let ranks = [];
+                    for (let member of members) {
+                        let found = false;
+                        const response = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22SV%22:%22${encodeURIComponent(member.N)}%22`);
+                        const jsonData = await response.json();
+                        if (jsonData.return_code == "0") {
+                            for (let rank of jsonData.content.L) {
+                                if (rank[2].OID == member.OID) {
+                                    found = true;
+                                    ranks.push(rank);
+                                    break;
+                                }
+                            }
+                        }
+                        if (!found) {
+                            ranks.push([-1, 0, member]);
+                        }
+                    }
+                    ranks.sort((a, b) => b[1] - a[1]);
+                    ranks.forEach((rank, i) => rank[0] = i + 1);
+                    this.alliance_players = ranks;
+                    this.alliance_id = allianceID;
+                    this.alliance_event = this.currentEventId;
+                }
+            }
+            this.last_rank = this.alliance_players.length;
+            let start = Math.min(Math.max(+this.current_search - 5, 0), this.alliance_players.length - 10);
+            let end = Math.min(Math.max(+this.current_search + 5, 10), this.alliance_players.length);
+            this.players = this.alliance_players.slice(start, end);
+        },
+
         async changeServer() {
             this.current_search = 1;
             await this.getRankingsByRank();
@@ -199,7 +249,11 @@ const app = Vue.createApp({
 
         async toggleAllianceRanking() {
             this.alliance_ranking = !this.alliance_ranking;
-            if (!(this.current_event_name in this.eventsList)) {
+            let player_to_alliance = this.events.player_to_alliance.find((e) => e[0 + !this.alliance_ranking] == this.current_event_name);
+            if (player_to_alliance) {
+                this.current_event_name = player_to_alliance[0 + this.alliance_ranking];
+            }
+            else {
                 this.current_event_name = Object.keys(this.eventsList)[0];
             }
             this.current_category_index = 0;
@@ -207,42 +261,96 @@ const app = Vue.createApp({
             await this.getRankingsByRank();
         },
 
+        async toggleAlliancePlayersRanking(alliance) {
+            this.alliance_ranking = !this.alliance_ranking;
+            let player_to_alliance = this.events.player_to_alliance.find((e) => e[0 + !this.alliance_ranking] == this.current_event_name);
+            if (player_to_alliance) {
+                this.current_event_name = player_to_alliance[0 + this.alliance_ranking];
+            }
+            else {
+                this.current_event_name = Object.keys(this.eventsList)[0];
+            }
+            this.current_search = 1;
+            this.current_category_index = -1;
+            this.alliance_name = alliance[1]
+            await this.getRankingsByAlliance(alliance[0]);
+        },
+
         async changeEvent() {
+            this.current_search = 1;
+            if (this.current_category_index >= 0) {
+            this.current_category_index = 0;
             this.current_category_index = 0;
             this.current_search = 1;
-            await this.getRankingsByRank();
+                this.current_category_index = 0;
+            this.current_search = 1;
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async previousCategory() {
-            this.current_category_index = (this.current_category_index + this.nbCategories - 1) % this.nbCategories;
+            if (this.current_category_index < 0) {
+                this.current_category_index = 0;
+            }
+            else {
+                this.current_category_index = (this.current_category_index + this.nbCategories - 1) % this.nbCategories;
+            }
             this.current_search = 1;
             await this.getRankingsByRank();
         },
 
         async nextCategory() {
-            this.current_category_index = (this.current_category_index + 1) % this.nbCategories;
+            if (this.current_category_index < 0) {
+                this.current_category_index = 0;
+            }
+            else {
+                this.current_category_index = (this.current_category_index + 1) % this.nbCategories;
+            }
             this.current_search = 1;
             await this.getRankingsByRank();
         },
 
         async firstPage() {
             this.current_search = 1;
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async lastPage() {
             this.current_search = this.last_rank;
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async previousPage() {
             this.current_search = Math.max(1, this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] - this.players.length || 1);
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async nextPage() {
             this.current_search = this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] + this.players.length || 1;
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async search() {
@@ -252,13 +360,34 @@ const app = Vue.createApp({
                     if (+this.current_search <= 0) {
                         this.current_search = 1;
                     }
-                    await this.getRankingsByRank();
+                    if (this.current_category_index >= 0) {
+                        await this.getRankingsByRank();
+                    }
+                    else {
+                        await this.getRankingsByAlliance(this.alliance_id);
+                    }
                 }
                 else {
-                    await this.getRankingsByName();
+                    if (this.current_category_index >= 0) {
+                        await this.getRankingsByName();
+                    }
+                    else {
+                        await this.searchByNameInAlliance();
+                    }
                 }
             }
         },
+
+        async searchByNameInAlliance() {
+            this.current_search = this.alliance_players.findIndex((player) => player[this.offset(2)].N.toLowerCase() == this.current_search.toLowerCase())
+            
+            if (this.current_search == -1) {
+                this.current_search = 1;
+                alert(this.texts.alert_playerName_notFound);
+            }
+            this.getRankingsByAlliance(this.alliance_id);
+        },
+
 
         formatNumber(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");

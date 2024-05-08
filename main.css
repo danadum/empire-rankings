@@ -32,6 +32,8 @@ body, html {
 
 #alliance_toggle {
     width: fit-content;
+    border-radius: 0.3em;
+    overflow: hidden;
 }
 
 #alliance_toggle button {
@@ -44,16 +46,6 @@ body, html {
     border-radius: 0;
     background-color: #e0e1e2;
     font-weight: bold;
-}
-
-#alliance_toggle button:first-child {
-    border-top-left-radius: 0.3em;
-    border-bottom-left-radius: 0.3em;
-}
-
-#alliance_toggle button:last-child {
-    border-top-right-radius: 0.3em;
-    border-bottom-right-radius: 0.3em;
 }
 
 #alliance_toggle button.active {
@@ -131,17 +123,35 @@ body, html {
     height: 1.5em;
 }
 
+.members p, .members img {
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+}
+
+.members p {
+    margin-inline-end: 0.5em;
+}
+
+.members a {
+    cursor: pointer;
+}
+
+.player_name p {
+    margin: 0;
+}
+
 .medal div {
     display: inline-block;
     margin: 0 0.2em;
 }
 
 .medal div:first-child {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .medal div:last-child {
-    margin-right: 0;
+    margin-inline-end: 0;
 }
 
 .medal p, .medal img {

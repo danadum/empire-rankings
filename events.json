@@ -527,5 +527,16 @@
                 }
             ]
         }
-    }
+    },
+    "player_to_alliance": [
+        ["honorPoints", "allianceHonor"],
+        ["playerMight", "allianceMight"],
+        ["event_title_71", "event_title_71"],
+        ["event_title_72", "event_title_72"],
+        ["event_title_80", "event_title_80"],
+        ["event_title_85", "event_title_85"],
+        ["dialog_redAlienInvasion_message_header", "dialog_redAlienInvasion_message_header"],
+        ["event_title_601", "event_title_601"],
+        ["event_title_113", "event_title_113"]
+    ]
 }
