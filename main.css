@@ -197,6 +197,17 @@ td img, button img {
     transform: rotate(90deg);
 }
 
+.header_div {
+    position: relative;
+}
+
+.downloadIcon {
+    position: absolute;
+    right: 0.5em;
+    background: none;
+    border: none;
+}
+
 #table tbody td {
     height: 1.5em;
 }

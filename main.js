@@ -89,11 +89,12 @@ const app = Vue.createApp({
                 <thead>
                     <tr v-if="this.nbCategories > 1 || this.current_category_index < 0">
                         <th id="category" colspan="10">
-                            <div>
+                            <div class="header_div">
                                 <button @click="this.previousCategory"><img src="assets/arrow_up.svg" alt="next category" :class="this.current_language == 'ar' ? 'rightArrow' : 'leftArrow'"/></button>
                                 <p> {{ this.current_category_index < 0 ? this.alliance_name : this.texts[this.currentCategory.name].replace(this.currentCategory.placeholder ?? '{0}', this.currentCategory.value).trim().replace(/ +/g, ' ') }}</p>
                                 <button @click="this.nextCategory"><img src="assets/arrow_up.svg" alt="previous category" :class="this.current_language == 'ar' ? 'leftArrow' : 'rightArrow'"/></button>
-                            </div>                   
+                                <button v-if="this.current_category_index < 0 && this.alliance_players.length > 0" @click="this.downloadCsv" class="downloadIcon"><img src="assets/download.svg" alt="download"/></button>
+                            </div>
                         </th>
                     </tr>
                     <tr>
@@ -351,6 +352,21 @@ const app = Vue.createApp({
             else {
                 await this.getRankingsByAlliance(this.alliance_id);
             }
+        },
+
+        downloadCsv() {
+            console.log(this.alliance_players);
+            csvData = [["rang", "points", "ID Joueur", "Nom Joueur", "ID Alliance", "Nom Alliance"].join(";")];
+            for (player of this.alliance_players) {
+                csvData.push([player[0], player[1], player[2].OID, player[2].N, player[2].AID, player[2].AN].join(";"))
+            }
+            let blob = new Blob([csvData.join("\n")], { type: 'text/csv' });
+            url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'ranking.csv';
+            document.body.appendChild(a);
+            a.click();
         },
 
         async search() {
