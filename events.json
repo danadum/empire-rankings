@@ -423,6 +423,15 @@
                     "name": "dialog_ci_filter01_all"
                 }
             ]
+        },
+        "eventBuilding_DonationEvent": {
+            "id": 79,
+            "categories": [
+                {
+                    "id": 1,
+                    "name": "dialog_ci_filter01_all"
+                }
+            ]
         }
     },
     "alliance": {
