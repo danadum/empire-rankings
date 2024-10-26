@@ -133,12 +133,12 @@ const app = Vue.createApp({
                                     <button @click="this.nextCategory"><img src="assets/arrow_up.svg" alt="previous category" :class="this.current_language == 'ar' ? 'leftArrow' : 'rightArrow'"/></button>
                                 </div>
                             </td>
-                            <!--<td id="search" colspan="10">
+                            <td id="search" colspan="10">
                                 <div>
                                     <input id="search_input" :placeholder="this.texts.dialog_highscore_search" @keydown.enter="this.search"/>
                                     <button @click="this.search"><img src="assets/search.svg" alt="search"/></button>
                                 </div>
-                            </td>-->
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
