@@ -13,6 +13,10 @@ const app = Vue.createApp({
             current_category_index: window.sessionStorage.getItem('category') ?? 0,
             current_search: window.sessionStorage.getItem('search') ??  1,
             last_rank: 1,
+            alliance_id: null,
+            alliance_name: "",
+            alliance_players: [],
+            alliance_event: null,
             alliance_ranking: !!window.sessionStorage.getItem('alliance') ?? false
         }
     },
@@ -199,6 +203,46 @@ const app = Vue.createApp({
             }
         },
 
+        async getRankingsByAlliance(allianceID) {
+            if (this.alliance_id != allianceID || this.alliance_event != this.currentEventId) {
+                this.players = [];
+                let alliance = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/ain/%22AID%22:${allianceID}`);
+                alliance = await alliance.json();
+                if (alliance.return_code == "0") {
+                    this.alliance_name = alliance.content.A.N;
+                    let members = alliance.content.A.M;
+    
+                    let ranks = [];
+                    for (let member of members) {
+                        let found = false;
+                        const response = await fetch(`https://empire-api.fly.dev/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22SV%22:%22${encodeURIComponent(member.N)}%22`);
+                        const jsonData = await response.json();
+                        if (jsonData.return_code == "0") {
+                            for (let rank of jsonData.content.L) {
+                                if (rank[2].OID == member.OID) {
+                                    found = true;
+                                    ranks.push(rank);
+                                    break;
+                                }
+                            }
+                        }
+                        if (!found) {
+                            ranks.push([-1, 0, member]);
+                        }
+                    }
+                    ranks.sort((a, b) => b[1] - a[1]);
+                    ranks.forEach((rank, i) => rank[0] = i + 1);
+                    this.alliance_players = ranks;
+                    this.alliance_id = allianceID;
+                    this.alliance_event = this.currentEventId;
+                }
+            }
+            this.last_rank = this.alliance_players.length;
+            let start = Math.min(Math.max(+this.current_search - 5, 0), this.alliance_players.length - 10);
+            let end = Math.min(Math.max(+this.current_search + 5, 10), this.alliance_players.length);
+            this.players = this.alliance_players.slice(start, end);
+        },
+
         async changeServer() {
             this.current_search = 1;
             await this.getRankingsByRank();
@@ -206,7 +250,11 @@ const app = Vue.createApp({
 
         async toggleAllianceRanking() {
             this.alliance_ranking = !this.alliance_ranking;
-            if (!(this.current_event_name in this.eventsList)) {
+            let player_to_alliance = this.events.player_to_alliance.find((e) => e[0 + !this.alliance_ranking] == this.current_event_name);
+            if (player_to_alliance) {
+                this.current_event_name = player_to_alliance[0 + this.alliance_ranking];
+            }
+            else {
                 this.current_event_name = Object.keys(this.eventsList)[0];
             }
             this.current_category_index = 0;
@@ -214,42 +262,111 @@ const app = Vue.createApp({
             await this.getRankingsByRank();
         },
 
+        async toggleAlliancePlayersRanking(alliance) {
+            this.alliance_ranking = !this.alliance_ranking;
+            let player_to_alliance = this.events.player_to_alliance.find((e) => e[0 + !this.alliance_ranking] == this.current_event_name);
+            if (player_to_alliance) {
+                this.current_event_name = player_to_alliance[0 + this.alliance_ranking];
+            }
+            else {
+                this.current_event_name = Object.keys(this.eventsList)[0];
+            }
+            this.current_search = 1;
+            this.current_category_index = -1;
+            this.alliance_name = alliance[1]
+            await this.getRankingsByAlliance(alliance[0]);
+        },
+
         async changeEvent() {
+            this.current_search = 1;
+            if (this.current_category_index >= 0) {
+            this.current_category_index = 0;
             this.current_category_index = 0;
             this.current_search = 1;
-            await this.getRankingsByRank();
+                this.current_category_index = 0;
+            this.current_search = 1;
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async previousCategory() {
-            this.current_category_index = (this.current_category_index + this.nbCategories - 1) % this.nbCategories;
+            if (this.current_category_index < 0) {
+                this.current_category_index = 0;
+            }
+            else {
+                this.current_category_index = (this.current_category_index + this.nbCategories - 1) % this.nbCategories;
+            }
             this.current_search = 1;
             await this.getRankingsByRank();
         },
 
         async nextCategory() {
-            this.current_category_index = (this.current_category_index + 1) % this.nbCategories;
+            if (this.current_category_index < 0) {
+                this.current_category_index = 0;
+            }
+            else {
+                this.current_category_index = (this.current_category_index + 1) % this.nbCategories;
+            }
             this.current_search = 1;
             await this.getRankingsByRank();
         },
 
         async firstPage() {
             this.current_search = 1;
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async lastPage() {
             this.current_search = this.last_rank;
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async previousPage() {
             this.current_search = Math.max(1, this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] - this.players.length || 1);
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
         },
 
         async nextPage() {
             this.current_search = this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] + this.players.length || 1;
-            await this.getRankingsByRank();
+            if (this.current_category_index >= 0) {
+                await this.getRankingsByRank();
+            }
+            else {
+                await this.getRankingsByAlliance(this.alliance_id);
+            }
+        },
+
+        downloadCsv() {
+            console.log(this.alliance_players);
+            csvData = [["rang", "points", "ID Joueur", "Nom Joueur", "ID Alliance", "Nom Alliance"].join(";")];
+            for (player of this.alliance_players) {
+                csvData.push([player[0], player[1], player[2].OID, player[2].N, player[2].AID, player[2].AN].join(";"))
+            }
+            let blob = new Blob([csvData.join("\n")], { type: 'text/csv' });
+            url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = 'ranking.csv';
+            document.body.appendChild(a);
+            a.click();
         },
 
         async search() {
@@ -259,13 +376,34 @@ const app = Vue.createApp({
                     if (+this.current_search <= 0) {
                         this.current_search = 1;
                     }
-                    await this.getRankingsByRank();
+                    if (this.current_category_index >= 0) {
+                        await this.getRankingsByRank();
+                    }
+                    else {
+                        await this.getRankingsByAlliance(this.alliance_id);
+                    }
                 }
                 else {
-                    await this.getRankingsByName();
+                    if (this.current_category_index >= 0) {
+                        await this.getRankingsByName();
+                    }
+                    else {
+                        await this.searchByNameInAlliance();
+                    }
                 }
             }
         },
+
+        async searchByNameInAlliance() {
+            this.current_search = this.alliance_players.findIndex((player) => player[this.offset(2)].N.toLowerCase() == this.current_search.toLowerCase())
+            
+            if (this.current_search == -1) {
+                this.current_search = 1;
+                alert(this.texts.alert_playerName_notFound);
+            }
+            this.getRankingsByAlliance(this.alliance_id);
+        },
+
 
         formatNumber(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");

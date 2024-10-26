@@ -281,17 +281,35 @@ select option {
     height: 1.5em;
 }
 
+.members p, .members img {
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+}
+
+.members p {
+    margin-inline-end: 0.5em;
+}
+
+.members a {
+    cursor: pointer;
+}
+
+.player_name p {
+    margin: 0;
+}
+
 .medal div {
     display: inline-block;
     margin: 0 0.2em;
 }
 
 .medal div:first-child {
-    margin-left: 0;
+    margin-inline-start: 0;
 }
 
 .medal div:last-child {
-    margin-right: 0;
+    margin-inline-end: 0;
 }
 
 .medal p,
