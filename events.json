@@ -432,6 +432,15 @@
                     "name": "dialog_ci_filter01_all"
                 }
             ]
+        },
+        "dialog_title_gachadeco2x2": {
+            "id": 80,
+            "categories": [
+                {
+                    "id": 1,
+                    "name": "dialog_ci_filter01_all"
+                }
+            ]            
         }
     },
     "alliance": {
