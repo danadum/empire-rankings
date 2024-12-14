@@ -60,8 +60,6 @@ const app = Vue.createApp({
     /*html*/
     `
     <div class="wrapper">
-        <div class="gradientBar"></div>
-        <!--<div class="contentCreater flexc">Made by  <a class="creater" href="https://dasdebjeet.github.io"><strong>Debjeet</strong>Das.</a> (aka Grim.Reaper)</div>-->
         <h1 class="flexc"><img src="./assets/nlogo.png"/></h1>
         <section :style="{direction: this.current_language == 'ar' ? 'rtl' : 'ltr'}">
             <select class="flexc" id="languages" v-model="this.current_language" @change="changeLanguage">
