@@ -387,7 +387,7 @@
                     "id": 1,
                     "name": "dialog_ci_filter01_all"
                 }
-            ]    
+            ]
         },
         "event_title_89": {
             "id": 72,
@@ -426,6 +426,24 @@
         },
         "eventBuilding_DonationEvent": {
             "id": 79,
+            "categories": [
+                {
+                    "id": 1,
+                    "name": "dialog_ci_filter01_all"
+                }
+            ]
+        },
+        "dialog_title_gachadeco2x2": {
+            "id": 80,
+            "categories": [
+                {
+                    "id": 1,
+                    "name": "dialog_ci_filter01_all"
+                }
+            ]
+        },
+        "title_christmasgacha": {
+            "id": 81,
             "categories": [
                 {
                     "id": 1,
@@ -525,7 +543,7 @@
                     "id": 1,
                     "name": "dialog_ci_filter01_all"
                 }
-            ]    
+            ]
         },
         "event_title_113": {
             "id": 77,
@@ -535,44 +553,44 @@
                     "name": "dialog_ci_filter01_all"
                 }
             ]
-        },
-        "eventBuilding_DonationEvent": {
-            "id": 79,
-            "categories": [
-                {
-                    "id": 1,
-                    "name": "dialog_ci_filter01_all"
-                }
-            ]
-        },
-        "dialog_title_gachadeco2x2": {
-            "id": 80,
-            "categories": [
-                {
-                    "id": 1,
-                    "name": "dialog_ci_filter01_all"
-                }
-            ]            
-        },
-        "title_christmasgacha": {
-            "id": 81,
-            "categories": [
-                {
-                    "id": 1,
-                    "name": "dialog_ci_filter01_all"
-                }
-            ]            
-        },
+        }
     },
     "player_to_alliance": [
-        ["honorPoints", "allianceHonor"],
-        ["playerMight", "allianceMight"],
-        ["event_title_71", "event_title_71"],
-        ["event_title_72", "event_title_72"],
-        ["event_title_80", "event_title_80"],
-        ["event_title_85", "event_title_85"],
-        ["dialog_redAlienInvasion_message_header", "dialog_redAlienInvasion_message_header"],
-        ["event_title_601", "event_title_601"],
-        ["event_title_113", "event_title_113"]
+        [
+            "honorPoints",
+            "allianceHonor"
+        ],
+        [
+            "playerMight",
+            "allianceMight"
+        ],
+        [
+            "event_title_71",
+            "event_title_71"
+        ],
+        [
+            "event_title_72",
+            "event_title_72"
+        ],
+        [
+            "event_title_80",
+            "event_title_80"
+        ],
+        [
+            "event_title_85",
+            "event_title_85"
+        ],
+        [
+            "dialog_redAlienInvasion_message_header",
+            "dialog_redAlienInvasion_message_header"
+        ],
+        [
+            "event_title_601",
+            "event_title_601"
+        ],
+        [
+            "event_title_113",
+            "event_title_113"
+        ]
     ]
 }
