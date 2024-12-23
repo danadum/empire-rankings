@@ -4,29 +4,31 @@
 
 :root {
     --themeC: #71FCAA;
-    --bgGrey: #2D2E32;
-    --fullDarkGrey: #191A1D;
-    --DarkGrey: #25262A;
-    --greyLight: #999999;
-    --wt: #ffffff;
+    --bgGrey: #1E1E1E;
+    --fullDarkGrey: #121212;
+    --DarkGrey: #282828;
+    --greyLight: #B3B3B3;
+    --wt: #F0F0F0;
+    --hoverBg: #383838;
 }
 
 /* custom scrollbar */
 
 /* width */
 ::-webkit-scrollbar {
-    width: 4px;
+    width: 6px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--fullDarkGrey);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
     background: var(--greyLight);
-    transition: all 0.2s ease-in-out;
+    border-radius: 4px;
+    transition: background 0.3s ease-in-out;
 }
 
 /* Handle on hover */
@@ -40,10 +42,10 @@
 * {
     margin: 0;
     padding: 0;
-    /* border: 0; */
     outline: 0;
     box-sizing: border-box;
     scroll-behavior: smooth;
+    text-decoration: none;
 }
 
 .flexc {
@@ -54,53 +56,60 @@
 
 body,
 html {
-    background: url('./assets/bgpic.png'), var(--bgGrey) no-repeat;
-    background-size: contain;
+    background-color: var(--bgGrey);
     color: var(--wt);
-
     margin: 0;
     padding: 0;
-}
-
-* {
-    /* font-family: 'Times New Roman', Times, serif !important; */
     font-family: "Nunito", sans-serif !important;
 }
 
-a{
-    text-decoration: none;
+a {
+    color: var(--greyLight);
 }
 
-.contentCreater{
-    background: var(--bgGrey);
+a:hover {
+    color: var(--themeC);
+}
+
+.contentCreater {
+    background: var(--DarkGrey);
     position: absolute;
     bottom: 20px;
     right: 0px;
     padding: 8px 20px;
-    color: #000000;
+    color: var(--greyLight);
     border-radius: 50px 0 0 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-.creater,  .creater strong{
+.creater,
+.creater strong {
     font-family: 'Rajdhani', sans-serif !important;
     letter-spacing: 0.5px;
     word-spacing: -3px;
-    /* color: #ffffff !important; */
-    animation: changeColor 8s infinite alternate; /* Apply the animation */
+    animation: changeColor 8s infinite alternate;
 }
 
-.creater{
+.creater {
     margin: 0 5px;
 }
 
 /* Define the keyframe animation */
 @keyframes changeColor {
-    0% { color: #9100ff; }
-    50% { color: #71FCAA; }
-    100% { color: #00e7ff; }
+    0% {
+        color: #9100ff;
+    }
+
+    50% {
+        color: #71FCAA;
+    }
+
+    100% {
+        color: #00e7ff;
+    }
 }
 
-h1{
+h1 {
     flex-direction: column-reverse;
     position: relative;
     padding: 20px 0 25px;
@@ -109,12 +118,13 @@ h1{
     font-style: normal;
     font-size: 2.5em;
     text-align: center;
-    color: #000000;
-    text-shadow: 0px 0px rgba(0, 0, 0, 0.5);
+    color: var(--wt);
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
 }
 
-h1>img{
+h1>img {
     width: 200px;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8));
 }
 
 .wrapper {
@@ -123,61 +133,85 @@ h1>img{
     min-height: 100vh;
 }
 
-
-section{
+section {
     margin: 0 20px;
+    position: relative;
 }
 
 
 #content {
     background: var(--fullDarkGrey);
     display: flex;
-    box-shadow: 0 0 1em rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 62px;
 }
 
 #languages {
-    background: #000000;
+	font-size: 1.2em;
+    background: var(--DarkGrey);
     color: var(--greyLight);
     position: absolute;
-    top: 20px;
     right: 20px;
-    padding: 5px;
-    width: 100px;
+    padding: 8px 15px;
+    min-width: 110px;
     text-align: center;
     margin: 0.83em auto;
-
     border: 0;
     border-radius: 50px;
     cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease-in-out;
+    z-index: 1;
+}
+
+#languages:hover {
+    background: var(--hoverBg);
 }
 
 
-.tableNavbar{
-    background: #000000;
-    justify-content: space-between;
+.tableNavbar {
+    background: var(--DarkGrey);
+    display: flex; /* changed */
+    justify-content: flex-start; /* changed */
+    align-items: center; /* changed */
     margin: 10px 0 35px;
     height: 50px;
-    box-shadow: 0 0 0.6em rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 0 10px;
 }
 
 #servers,
-#alliance_toggle,
 #events {
+    color: var(--greyLight);
+	background: var(--DarkGrey);
     background-color: transparent;
     width: fit-content;
     height: 100%;
     font-size: 1.2em;
     color: var(--greyLight);
     cursor: pointer;
-    border: 0;
+	border: 0;
+    border-radius: 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease-in-out;
+    margin-right: 10px;
+	margin-top: 20px;
 }
 
-#servers{
+#servers {
     padding: 0.5em 1em;
 }
 
+#servers:hover,
+#events:hover {
+    background: var(--hoverBg);
+}
+
 select option {
-    background: #000000;
+    background: var(--DarkGrey);
     color: var(--greyLight);
     border-radius: 0;
     border: none;
@@ -186,11 +220,15 @@ select option {
     cursor: pointer;
 }
 
-
 #alliance_toggle {
-    width: fit-content;
-    height: 100%;
-    border-radius: 50px
+	font-size: 1.2em;
+    position: absolute;
+	margin-top: 10px;
+    top: 60px;
+    right: 20px;
+    display: flex;
+    border-radius: 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 #alliance_toggle button {
@@ -203,13 +241,20 @@ select option {
     border: none;
     color: var(--greyLight);
     font-weight: bold;
+    border-radius: 50px;
+    transition: background 0.3s ease-in-out;
+
 }
 
+#alliance_toggle button:hover {
+    background-color: var(--hoverBg);
+}
 
 #alliance_toggle button.active {
     background-color: var(--themeC);
-    color: var(--DarkGrey);
+    color: var(--fullDarkGrey);
 }
+
 
 #table {
     flex-grow: 1;
@@ -220,15 +265,18 @@ select option {
     color: var(--greyLight);
     border-collapse: collapse;
     text-align: center;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-#table thead{
-    background: #000000;
-    border-radius:1em;
+#table thead {
+	height: 1em;
+    background: var(--DarkGrey);
+    border-radius: 0.5em;
 }
 
 #table tr {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--DarkGrey);
 }
 
 #table th,
@@ -237,7 +285,7 @@ select option {
 }
 
 #table th {
-    padding: 1em 0.2em;
+    padding: 0.8em 0.2em;
 }
 
 #table col {
@@ -250,17 +298,17 @@ select option {
 
 #table tbody tr:nth-child(1) {
     background: #9100ff;
-    color: #000000;
+    color: var(--wt);
 }
 
 #table tbody tr:nth-child(2) {
     background: #71FCAA;
-    color: #000000;
+    color: var(--fullDarkGrey);
 }
 
 #table tbody tr:nth-child(3) {
     background: #00e7ff;
-    color: #000000;
+    color: var(--fullDarkGrey);
 }
 
 #table tfoot tr {
@@ -268,7 +316,7 @@ select option {
 }
 
 #table tbody td {
-    height: 1.8em;
+    height: 2.5em;
 }
 
 
@@ -281,7 +329,8 @@ select option {
     height: 1.5em;
 }
 
-.members p, .members img {
+.members p,
+.members img {
     display: inline-block;
     margin: 0;
     vertical-align: middle;
@@ -328,29 +377,45 @@ select option {
 
 #category p {
     margin: 10px 0.8em;
-    /* width: 10em; */
     max-width: 250px;
 }
 
 #search input {
-    margin: 0 1em;
-    width: 17em;
+    margin: 0 0.8em;
+    width: 24em;
     text-align: center;
+    padding: 0.5em;
+    border-radius: 5px;
+    background: var(--DarkGrey);
+    color: var(--greyLight);
+    border: none;
+}
+
+#searchbox {
+	margin-top: 12px;
 }
 
 #navigate_buttons {
-    background: #000000;
+    background: var(--DarkGrey);
     padding: 5px 0;
     min-width: 2.5em;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 #navigate_buttons button {
-    background: var(--wt);
+    background: var(--DarkGrey);
     margin: 0.2em 0;
-    border: 2px var(--DarkGrey) solid !important;
+    border: 2px var(--fullDarkGrey) solid !important;
+    transition: background 0.3s ease-in-out;
+
+}
+
+#navigate_buttons button:hover {
+    background: var(--hoverBg);
 }
 
 #navigate_buttons button:nth-child(3) {
@@ -359,7 +424,7 @@ select option {
 
 #navigate_buttons button,
 #table button {
-    background: var(--wt);
+    background: var(--DarkGrey);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -372,24 +437,39 @@ select option {
     border-radius: 50px;
     border: 0;
     cursor: pointer;
+    transition: background 0.3s ease-in-out;
+
 }
 
-#category button{
+#table button:hover,
+#navigate_buttons button:hover {
+    background: var(--hoverBg);
+}
+
+
+#category button {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bgGrey);
+    background: var(--DarkGrey);
     width: 30px;
     height: 30px;
     border-radius: 50px;
-    border: 2px var(--DarkGrey) solid !important;
+    border: 2px var(--fullDarkGrey) solid !important;
     cursor: pointer;
+    transition: background 0.3s ease-in-out;
 }
+
+#category button:hover {
+    background: var(--hoverBg);
+}
+
 
 td img,
 button img {
     height: 1em;
     margin: auto;
+    filter: invert(80%);
 }
 
 .leftArrow {
@@ -404,74 +484,93 @@ button img {
 .gradientBar {
     position: absolute;
     bottom: 0px;
-
     background: linear-gradient(to left, #9100ff, #71FCAA, #00e7ff);
     background-size: 400% 400%;
-
     width: 100%;
     height: 3px;
-
     -webkit-animation: AnimationName 30s ease infinite;
     -moz-animation: AnimationName 30s ease infinite;
     animation: AnimationName 30s ease infinite;
 }
 
 @-webkit-keyframes AnimationName {
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
+
 @-moz-keyframes AnimationName {
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
+
 @keyframes AnimationName {
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
-}
-
-
-
-
-
-@media all and (orientation: portrait) {
-    #table {
-        font-size: 0.8em;
+    0% {
+        background-position: 0% 50%;
     }
 
-    #table tbody td {
-        height: 2.25em;
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
     }
 }
-
 
 /* Media Query */
 
 /* Extra small devices (phones, 600px and down) */
-@media only screen and (max-width:481px),
+@media only screen and (max-width: 481px),
 screen and (max-width: 600px) {
 
-    .tableNavbar{
+    .tableNavbar {
         flex-direction: column;
         height: fit-content;
     }
-    
+
     #servers,
-    #alliance_toggle,
     #events {
         width: 100%;
         height: 100%;
         padding: 10px 8px;
+        margin-right: 0;
     }
 
-    #alliance_toggle{
+      #alliance_toggle {
         width: 100%;
         padding: 0;
-    } 
+        position: relative;
+        top: 0;
+        right: 0;
+        margin-top: 10px;
+        box-shadow: none;
 
-    #alliance_toggle button{
+    }
+
+    #alliance_toggle button {
         width: 50%;
-    }      
+    }
+
+
+    #search input {
+        width: 10em;
+    }
 }
