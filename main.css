@@ -10,6 +10,12 @@
     --greyLight: #B3B3B3;
     --wt: #F0F0F0;
     --hoverBg: #383838;
+    /* Light Mode Colors */
+    --lightBg: #f0f0f0;
+    --lightGrey: #e0e0e0;
+    --lightText: #333;
+    --lightHoverBg: #d0d0d0;
+    --lightBorder: #ccc; /* Added light mode border color */
 }
 
 /* custom scrollbar */
@@ -54,19 +60,63 @@
     align-items: center;
 }
 
-body,
-html {
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Nunito", sans-serif !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
     background-color: var(--bgGrey);
-    background-image: radial-gradient(circle, rgba(40, 40, 40, 1), rgba(30, 30, 30, 1), rgba(20, 20, 20, 1));
     color: var(--wt);
-    margin: 0;
-    padding: 0;
-    font-family: "Nunito", sans-serif !important;
+}
+
+
+body.light-mode {
+    background-color: var(--lightBg);
+    color: var(--lightText);
+}
+
+section {
+    margin: 0 20px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    /* The following line was added */
+    background-image: radial-gradient(circle, rgba(40, 40, 40, 1), rgba(30, 30, 30, 1), rgba(20, 20, 20, 1));
+}
+
+body.light-mode section {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* The following line was added */
+       background-image: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+}
+
+.gradientBar {
+    position: absolute;
+    bottom: 0px;
+    background: linear-gradient(to left, #9100ff, #71FCAA, #00e7ff);
+    background-size: 400% 400%;
+    width: 100%;
+    height: 3px;
+    -webkit-animation: AnimationName 30s ease infinite;
+    -moz-animation: AnimationName 30s ease infinite;
+    animation: AnimationName 30s ease infinite;
+}
+
+body.light-mode .gradientBar{
+        background: linear-gradient(to left, #71FCAA, #9100ff, #00e7ff);
 }
 
 a {
     color: var(--greyLight);
 }
+
+body.light-mode a {
+    color: var(--lightText);
+}
+
 
 a:hover {
     color: var(--themeC);
@@ -81,6 +131,12 @@ a:hover {
     color: var(--greyLight);
     border-radius: 50px 0 0 50px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.light-mode .contentCreater {
+        background: var(--lightGrey);
+        color: var(--lightText);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .creater,
@@ -123,9 +179,18 @@ h1 {
     text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.8);
 }
 
+body.light-mode h1 {
+    color: var(--lightText);
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+}
+
+
 h1>img {
     width: 200px;
     filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8));
+}
+body.light-mode h1>img {
+      filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.2));
 }
 
 .wrapper {
@@ -140,6 +205,10 @@ section {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+body.light-mode section {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 
 #content {
     background: var(--fullDarkGrey);
@@ -150,12 +219,26 @@ section {
     margin-top: 62px;
 }
 
+body.light-mode #content {
+    background: var(--lightGrey);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#topBar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
 #languages {
 	font-size: 1.2em;
     background: var(--DarkGrey);
     color: var(--greyLight);
-    position: absolute;
-    right: 20px;
+    position: relative;
     padding: 8px 15px;
     min-width: 110px;
     text-align: center;
@@ -168,10 +251,51 @@ section {
     z-index: 1;
 }
 
+body.light-mode #languages {
+    background: var(--lightGrey);
+    color: var(--lightText);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 #languages:hover {
     background: var(--hoverBg);
 }
 
+body.light-mode #languages:hover{
+        background: var(--lightHoverBg);
+}
+
+#theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 5px;
+  transition: transform 0.3s ease-in-out;
+  border-radius: 50px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode #theme-toggle {
+    background: var(--DarkGrey);
+    border: 2px solid var(--fullDarkGrey);
+}
+
+body.light-mode #theme-toggle {
+    background: var(--lightGrey);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+}
+
+#theme-toggle img {
+  height: 1.5em;
+    filter: invert(80%);
+    transition: filter 0.3s ease;
+}
+
+body.light-mode #theme-toggle img {
+    filter: none;
+}
 
 .tableNavbar {
     background: var(--DarkGrey);
@@ -183,6 +307,10 @@ section {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     border-radius: 8px;
     padding: 0 10px;
+}
+body.light-mode .tableNavbar {
+    background: var(--lightGrey);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #servers,
@@ -203,10 +331,23 @@ section {
 	margin-top: 20px;
 }
 
+body.light-mode #servers,
+body.light-mode #events{
+    background: var(--lightGrey);
+    color: var(--lightText);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 #servers:hover,
 #events:hover {
     background: var(--hoverBg);
 }
+
+body.light-mode #servers:hover,
+body.light-mode #events:hover{
+        background: var(--lightHoverBg);
+}
+
 
 select option {
     background: var(--DarkGrey);
@@ -218,7 +359,12 @@ select option {
     cursor: pointer;
 }
 
-#alliance_toggle {
+body.light-mode select option{
+    background: var(--lightGrey);
+    color: var(--lightText);
+}
+
+#alliance_toggle {	
 	font-size: 1.2em;
     position: absolute;
 	margin-top: 10px;
@@ -228,6 +374,11 @@ select option {
     border-radius: 50px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
+
+body.light-mode #alliance_toggle {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 
 #alliance_toggle button {
     background-color: var(--DarkGrey);
@@ -244,8 +395,16 @@ select option {
 
 }
 
+body.light-mode #alliance_toggle button {
+    background-color: var(--lightGrey);
+    color: var(--lightText);
+}
+
 #alliance_toggle button:hover {
     background-color: var(--hoverBg);
+}
+body.light-mode #alliance_toggle button:hover {
+    background-color: var(--lightHoverBg);
 }
 
 #alliance_toggle button.active {
@@ -253,6 +412,10 @@ select option {
     color: var(--fullDarkGrey);
 }
 
+body.light-mode #alliance_toggle button.active {
+    background-color: var(--themeC);
+    color: var(--fullDarkGrey); /* Updated text color for active button in light mode */
+}
 
 #table {
     flex-grow: 1;
@@ -267,15 +430,30 @@ select option {
     overflow: hidden;
 }
 
+body.light-mode #table {
+    background-color: var(--lightBg);
+    color: var(--lightText);
+}
+
 #table thead {
 	height: 1em;
     background: var(--DarkGrey);
     border-radius: 0.5em;
 }
 
+body.light-mode #table thead {
+    background: var(--lightGrey);
+}
+
+
 #table tr {
     border-bottom: 1px solid var(--DarkGrey);
 }
+
+body.light-mode #table tr {
+    border-bottom: 1px solid var(--lightBorder);
+}
+
 
 #table th,
 #table td {
@@ -298,16 +476,26 @@ select option {
     background: #9100ff;
     color: var(--wt);
 }
+body.light-mode #table tbody tr:nth-child(1) {
+        color: var(--lightBg);
+}
 
 #table tbody tr:nth-child(2) {
     background: #71FCAA;
     color: var(--fullDarkGrey);
+}
+body.light-mode #table tbody tr:nth-child(2) {
+        color: var(--lightBg);
 }
 
 #table tbody tr:nth-child(3) {
     background: #00e7ff;
     color: var(--fullDarkGrey);
 }
+body.light-mode #table tbody tr:nth-child(3) {
+        color: var(--lightBg);
+}
+
 
 #table tfoot tr {
     border-bottom: none;
@@ -389,6 +577,12 @@ select option {
     border: none;
 }
 
+body.light-mode #search input {
+    background: var(--lightGrey);
+    color: var(--lightText);
+}
+
+
 #searchbox {
 	margin-top: 12px;
 }
@@ -404,6 +598,11 @@ select option {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+body.light-mode #navigate_buttons {
+    background: var(--lightGrey);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 #navigate_buttons button {
     background: var(--DarkGrey);
     margin: 0.2em 0;
@@ -412,9 +611,19 @@ select option {
 
 }
 
+body.light-mode #navigate_buttons button{
+        background: var(--lightGrey);
+        border: 2px var(--lightBorder) solid !important;
+}
+
 #navigate_buttons button:hover {
     background: var(--hoverBg);
 }
+
+body.light-mode #navigate_buttons button:hover{
+        background: var(--lightHoverBg);
+}
+
 
 #navigate_buttons button:nth-child(3) {
     margin-top: auto;
@@ -439,11 +648,20 @@ select option {
 
 }
 
+body.light-mode #navigate_buttons button,
+body.light-mode #table button {
+    background: var(--lightGrey);
+}
+
 #table button:hover,
 #navigate_buttons button:hover {
     background: var(--hoverBg);
 }
 
+body.light-mode #table button:hover,
+body.light-mode #navigate_buttons button:hover{
+        background: var(--lightHoverBg);
+}
 
 #category button {
     display: flex;
@@ -458,8 +676,18 @@ select option {
     transition: background 0.3s ease-in-out;
 }
 
+body.light-mode #category button {
+    background: var(--lightGrey);
+    border: 2px var(--lightBorder) solid !important;
+}
+
+
 #category button:hover {
     background: var(--hoverBg);
+}
+
+body.light-mode #category button:hover {
+    background: var(--lightHoverBg);
 }
 
 
@@ -468,6 +696,10 @@ button img {
     height: 1em;
     margin: auto;
     filter: invert(80%);
+}
+body.light-mode td img,
+body.light-mode button img {
+    filter: none;
 }
 
 .leftArrow {
@@ -489,6 +721,10 @@ button img {
     -webkit-animation: AnimationName 30s ease infinite;
     -moz-animation: AnimationName 30s ease infinite;
     animation: AnimationName 30s ease infinite;
+}
+
+body.light-mode .gradientBar{
+        background: linear-gradient(to left, #71FCAA, #9100ff, #00e7ff);
 }
 
 @-webkit-keyframes AnimationName {
@@ -562,11 +798,13 @@ screen and (max-width: 600px) {
         box-shadow: none;
 
     }
+    body.light-mode  #alliance_toggle {
+            box-shadow: none;
+    }
 
     #alliance_toggle button {
         width: 50%;
     }
-
 
     #search input {
         width: 10em;

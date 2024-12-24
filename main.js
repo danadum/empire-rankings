@@ -7,8 +7,8 @@ const app = Vue.createApp({
             events: {},
             texts: {},
             players: [],
-            current_language: 'en',
-            current_server_header: 'EmpireEx_2',
+            current_language: 'fr',
+            current_server_header: 'EmpireEx_3',
             current_event_name: window.sessionStorage.getItem('event') ?? '',
             current_category_index: window.sessionStorage.getItem('category') ?? 0,
             current_search: window.sessionStorage.getItem('search') ??  1,
@@ -17,11 +17,15 @@ const app = Vue.createApp({
             alliance_name: "",
             alliance_players: [],
             alliance_event: null,
-            alliance_ranking: !!window.sessionStorage.getItem('alliance') ?? false
+            alliance_ranking: !!window.sessionStorage.getItem('alliance') ?? false,
+            darkMode: true,
         }
     },
 
     async mounted() {
+        this.darkMode = localStorage.getItem('darkMode') === 'true' ? true : false;
+        this.applyTheme();
+
         await this.getLanguages();
         if (this.languages.includes(window.localStorage.getItem('language'))) {
             this.current_language = window.localStorage.getItem('language');
@@ -59,10 +63,16 @@ const app = Vue.createApp({
 	template:
     /*html*/
     `
-    <section :style="{direction: this.current_language == 'ar' ? 'rtl' : 'ltr'}">
-        <select id="languages" v-model="this.current_language" @change="changeLanguage">
-            <option v-for="language in languages" :value="language" :key="language">{{ this.texts["language_native_" + language.toLowerCase()] }}</option>
-        </select>
+    <section :class="{'dark-mode': darkMode, 'light-mode': !darkMode}" :style="{direction: this.current_language == 'ar' ? 'rtl' : 'ltr'}">
+        <div id="topBar">
+            <select id="languages" v-model="this.current_language" @change="changeLanguage">
+                <option v-for="language in languages" :value="language" :key="language">{{ this.texts["language_native_" + language.toLowerCase()] }}</option>
+            </select>
+            <button id="theme-toggle" @click="toggleTheme">
+                <img v-if="darkMode" src="assets/sun.svg" alt="Light Mode" />
+                <img v-else src="assets/moon.svg" alt="Dark Mode" />
+            </button>
+        </div>
         <div id="alliance_toggle">
             <button @click="this.toggleAllianceRanking" :class="[this.alliance_ranking ? '' : 'active']">{{ this.texts.player }}</button>
             <button @click="this.toggleAllianceRanking" :class="[this.alliance_ranking ? 'active' : '']">{{ this.texts.dialog_alliance_name_default }}</button>
@@ -402,6 +412,17 @@ const app = Vue.createApp({
                 alert(this.texts.alert_playerName_notFound);
             }
             this.getRankingsByAlliance(this.alliance_id);
+        },
+
+        toggleTheme() {
+            this.darkMode = !this.darkMode;
+            localStorage.setItem('darkMode', this.darkMode);
+            this.applyTheme();
+        },
+
+        applyTheme() {
+            document.body.classList.toggle('dark-mode', this.darkMode);
+            document.body.classList.toggle('light-mode', !this.darkMode);
         },
 
 
