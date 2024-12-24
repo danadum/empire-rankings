@@ -187,7 +187,6 @@ section {
 #events {
     color: var(--greyLight);
 	background: var(--DarkGrey);
-    background-color: transparent;
     width: fit-content;
     height: 100%;
     padding: 0.5em 1em;
