@@ -57,6 +57,7 @@
 body,
 html {
     background-color: var(--bgGrey);
+    background-image: radial-gradient(circle, rgba(40, 40, 40, 1), rgba(30, 30, 30, 1), rgba(20, 20, 20, 1));
     color: var(--wt);
     margin: 0;
     padding: 0;
@@ -136,6 +137,7 @@ h1>img {
 section {
     margin: 0 20px;
     position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 
