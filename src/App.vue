@@ -101,6 +101,8 @@
                     `${import.meta.env.VITE_PROXY_URL}${this.game === "e4k" ? "https://raw.githubusercontent.com/danadum/ggs-assets/main/e4k/network.xml" : "https://empire-html5.goodgamestudios.com/config/network/1.xml"}`,
                 );
                 servers_file = new DOMParser().parseFromString(await servers_file.text(), "text/xml");
+                
+                this.servers = {};
                 for (let instance of servers_file.firstElementChild.firstElementChild.children) {
                     if (instance.children[2].textContent != "EmpireEx_23") {
                         this.servers[instance.children[2].textContent] = {
