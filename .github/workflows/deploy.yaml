@@ -1,0 +1,62 @@
+name: Build and Deploy GGE
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  test:
+    name: Test app
+    runs-on: ubuntu-latest
+    environment: prod
+    env:
+      VITE_BASE_PATH: /
+      VITE_GGE_API_URL: ${{ vars.VITE_GGE_API_URL }}
+      VITE_E4K_API_URL: ${{ vars.VITE_EK4_API_URL }}
+      VITE_PROXY_URL: ${{ vars.VITE_PROXY_URL }}
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@main
+
+      - name: Setup Node.js 🔧
+        uses: actions/setup-node@v2
+        with:
+          node-version: '22'
+
+      - name: Install dependencies 📦
+        run: npm install
+
+      - name: Lint code 🧹
+        run: npm run lint
+
+      - name: Build 🏗️
+        run: npm run build
+
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref_name == 'main'
+    environment: gge
+    env:
+      VITE_BASE_PATH: /${{ github.event.repository.name }}/
+      VITE_GGE_API_URL: ${{ vars.VITE_GGE_API_URL }}
+      VITE_E4K_API_URL: ${{ vars.VITE_EK4_API_URL }}
+      VITE_PROXY_URL: ${{ vars.VITE_PROXY_URL }}
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@main
+
+      - name: Install dependencies 📦
+        run: npm install
+
+      - name: Build 🏗️
+        run: npm run build
+
+      - name: Deploy to GH Pages 🚀
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
