@@ -29,6 +29,7 @@
                         ? true
                         : window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches,
                 show_settings: false,
+                base_path: import.meta.env.VITE_BASE_PATH,
             };
         },
 
@@ -484,8 +485,13 @@
                     type="button"
                     class="p-2.5 min-w-[40px] absolute top-2.5 start-2.5 inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                     aria-label="Settings">
-                    <div class="bg-current [mask-image:url(/src/assets/icons/settings.svg)]">
-                        <img src="/src/assets/icons/settings.svg" alt="Settings" class="h-6 opacity-0" />
+                    <div
+                        :style="`mask-image:url(${this.base_path}src/assets/icons/settings.svg)`"
+                        class="bg-current">
+                        <img
+                            :src="`${this.base_path}src/assets/icons/settings.svg`"
+                            alt="Settings"
+                            class="h-6 opacity-0" />
                     </div>
                 </button>
             </div>
@@ -506,8 +512,10 @@
                     type="button"
                     class="p-2.5 min-w-[40px] absolute top-2.5 end-2.5 inline-flex justify-center items-center gap-x-2 text-sm rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                     aria-label="Close">
-                    <div class="bg-current [mask-image:url(/src/assets/icons/close.svg)]">
-                        <img src="/src/assets/icons/close.svg" alt="Close" class="h-4 opacity-0" />
+                    <div
+                        :style="`mask-image:url(${this.base_path}src/assets/icons/close.svg)`"
+                        class="bg-current">
+                        <img :src="`${this.base_path}src/assets/icons/close.svg`" alt="Close" class="h-4 opacity-0" />
                     </div>
                 </button>
                 <div class="flex flex-col grow py-4 overflow-y-auto">
@@ -533,8 +541,8 @@
                                 :value="this.dark_mode"
                                 :change="toggleDarkMode"
                                 :choices="[
-                                    { text: '', icon: '/src/assets/icons/sun.svg' },
-                                    { text: '', icon: '/src/assets/icons/moon.svg' },
+                                    { text: '', icon: `${this.base_path}src/assets/icons/sun.svg` },
+                                    { text: '', icon: `${this.base_path}src/assets/icons/moon.svg` },
                                 ]" />
                         </li>
                         <li>
@@ -543,8 +551,8 @@
                                 :value="this.game === 'e4k'"
                                 :change="toggleGame"
                                 :choices="[
-                                    { text: 'GGE', icon: '/src/assets/icons/laptop.svg' },
-                                    { text: 'E4K', icon: '/src/assets/icons/mobile.svg' },
+                                    { text: 'GGE', icon: `${this.base_path}src/assets/icons/laptop.svg` },
+                                    { text: 'E4K', icon: `${this.base_path}src/assets/icons/mobile.svg` },
                                 ]" />
                         </li>
                         <li class="!mt-auto">
@@ -560,7 +568,7 @@
             </div>
 
             <img
-                :src="`/src/assets/images/logo-${this.game}.png`"
+                :src="`${this.base_path}src/assets/images/logo-${this.game}.png`"
                 alt="Game logo"
                 class="w-1/4 min-w-36 max-w-80 mx-auto mb-2" />
             <div class="flex flex-wrap mx-1.5 bg-gray-100 dark:bg-neutral-700 rounded-lg">
@@ -594,8 +602,11 @@
                     :value="this.alliance_ranking"
                     :change="toggleAllianceRanking"
                     :choices="[
-                        { text: this.texts.player, image: '/src/assets/images/player.png' },
-                        { text: this.texts.dialog_alliance_name_default, image: '/src/assets/images/alliance.png' },
+                        { text: this.texts.player, image: `${this.base_path}src/assets/images/player.png` },
+                        {
+                            text: this.texts.dialog_alliance_name_default,
+                            image: `${this.base_path}src/assets/images/alliance.png`,
+                        },
                     ]" />
             </div>
             <div class="grow flex flex-col">
@@ -611,9 +622,10 @@
                                         class="p-2.5 min-w-[40px] inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                                         aria-label="Previous">
                                         <div
-                                            class="bg-current -rotate-90 rtl:rotate-90 [mask-image:url(/src/assets/icons/arrow_up.svg)]">
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/arrow_up.svg)`"
+                                            class="bg-current -rotate-90 rtl:rotate-90">
                                             <img
-                                                src="/src/assets/icons/arrow_up.svg"
+                                                :src="`${this.base_path}src/assets/icons/arrow_up.svg`"
                                                 alt="Previous Category"
                                                 class="h-4 opacity-0" />
                                         </div>
@@ -638,9 +650,10 @@
                                         class="p-2.5 min-w-[40px] inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                                         aria-label="Next">
                                         <div
-                                            class="bg-current rotate-90 rtl:-rotate-90 [mask-image:url(/src/assets/icons/arrow_up.svg)]">
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/arrow_up.svg)`"
+                                            class="bg-current rotate-90 rtl:-rotate-90">
                                             <img
-                                                src="/src/assets/icons/arrow_up.svg"
+                                                :src="`${this.base_path}src/assets/icons/arrow_up.svg`"
                                                 alt="Next Category"
                                                 class="h-4 opacity-0" />
                                         </div>
@@ -651,9 +664,11 @@
                                         type="button"
                                         class="absolute end-2 p-2.5 min-w-[40px] inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                                         aria-label="Download">
-                                        <div class="bg-current [mask-image:url(/src/assets/icons/download.svg)]">
+                                        <div
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/download.svg)`"
+                                            class="bg-current">
                                             <img
-                                                src="/src/assets/icons/download.svg"
+                                                :src="`${this.base_path}src/assets/icons/download.svg`"
                                                 alt="Download"
                                                 class="h-4 opacity-0" />
                                         </div>
@@ -712,9 +727,10 @@
                                             v-if="this.players === null"
                                             class="text-center absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                                             <div
-                                                class="w-fit m-auto bg-current [mask-image:url(/src/assets/icons/error.svg)]">
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/error.svg)`"
+                                            class="bg-current w-fit m-auto">
                                                 <img
-                                                    src="/src/assets/icons/error.svg"
+                                                    :src="`${this.base_path}src/assets/icons/error.svg`"
                                                     alt="Error"
                                                     class="h-20 opacity-0" />
                                             </div>
@@ -811,9 +827,10 @@
                                                     {{ player[this.offset(2)]?.[2] }}
                                                     <div
                                                         v-if="player[this.offset(2)]?.[2]"
-                                                        class="bg-current [mask-image:url(/src/assets/icons/view.svg)]">
+                                                        :style="`mask-image:url(${this.base_path}src/assets/icons/view.svg)`"
+                                                        class="bg-current">
                                                         <img
-                                                            src="/src/assets/icons/view.svg"
+                                                            :src="`${this.base_path}src/assets/icons/view.svg`"
                                                             alt="View"
                                                             class="h-4 opacity-0" />
                                                     </div>
@@ -839,7 +856,7 @@
                                                     v-if="player[this.offset(2)]?.KLRID !== undefined"
                                                     class="h-8 inline-block"
                                                     :src="
-                                                        '/src/assets/images/title_' +
+                                                        `${this.base_path}src/assets/images/title_` +
                                                         ((player[this.offset(2)]?.KLRID - 1) >> 2) +
                                                         '.png'
                                                     "
@@ -848,7 +865,7 @@
                                                     class="h-8 inline-block"
                                                     v-if="(player[this.offset(2)]?.KLRID ?? 1) % 4 != 1"
                                                     :src="
-                                                        '/src/assets/images/title_level_' +
+                                                        `${this.base_path}src/assets/images/title_level_` +
                                                         ((player[this.offset(2)].KLRID - 1) % 4) +
                                                         '.png'
                                                     "
@@ -864,7 +881,7 @@
                                                         class="space-x-1 inline-block">
                                                         <span>{{ this.nbMedals(player, 1) }}</span>
                                                         <img
-                                                            src="/src/assets/images/medal_gold.png"
+                                                            :src="`${this.base_path}src/assets/images/medal_gold.png`"
                                                             alt="Gold medal"
                                                             class="h-4 inline-block" />
                                                     </div>
@@ -873,7 +890,7 @@
                                                         class="space-x-1 inline-block">
                                                         <span>{{ this.nbMedals(player, 2) }}</span>
                                                         <img
-                                                            src="/src/assets/images/medal_silver.png"
+                                                            :src="`${this.base_path}src/assets/images/medal_silver.png`"
                                                             alt="Silver medal"
                                                             class="h-4 inline-block" />
                                                     </div>
@@ -882,7 +899,7 @@
                                                         class="space-x-1 inline-block">
                                                         <span>{{ this.nbMedals(player, 3) }}</span>
                                                         <img
-                                                            src="/src/assets/images/medal_bronze.png"
+                                                            :src="`${this.base_path}src/assets/images/medal_bronze.png`"
                                                             alt="Bronze medal"
                                                             class="h-4 inline-block" />
                                                     </div>
@@ -914,9 +931,11 @@
                                     <div
                                         class="absolute inset-y-0 start-0 flex items-center ps-3 cursor-pointer"
                                         @click="this.search">
-                                        <div class="bg-current [mask-image:url(/src/assets/icons/search.svg)]">
+                                        <div
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/search.svg)`"
+                                            class="bg-current">
                                             <img
-                                                src="/src/assets/icons/search.svg"
+                                                :src="`${this.base_path}src/assets/icons/search.svg`"
                                                 alt="Search"
                                                 class="h-4 opacity-0" />
                                         </div>
@@ -934,9 +953,10 @@
                                         class="p-2.5 min-w-[40px] inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                                         aria-label="First">
                                         <div
-                                            class="bg-current -rotate-90 rtl:rotate-90 [mask-image:url(/src/assets/icons/double_arrow_up.svg)]">
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/double_arrow_up.svg)`"
+                                            class="bg-current -rotate-90 rtl:rotate-90">
                                             <img
-                                                src="/src/assets/icons/double_arrow_up.svg"
+                                                :src="`${this.base_path}src/assets/icons/double_arrow_up.svg`"
                                                 alt="First page"
                                                 class="h-4 opacity-0" />
                                         </div>
@@ -952,9 +972,10 @@
                                         class="p-2.5 min-w-[40px] inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                                         aria-label="Previous">
                                         <div
-                                            class="bg-current -rotate-90 rtl:rotate-90 [mask-image:url(/src/assets/icons/arrow_up.svg)]">
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/arrow_up.svg)`"
+                                            class="bg-current -rotate-90 rtl:rotate-90">
                                             <img
-                                                src="/src/assets/icons/arrow_up.svg"
+                                                :src="`${this.base_path}src/assets/icons/arrow_up.svg`"
                                                 alt="Previous page"
                                                 class="h-4 opacity-0" />
                                         </div>
@@ -1009,9 +1030,10 @@
                                         class="p-2.5 min-w-[40px] inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                                         aria-label="Next">
                                         <div
-                                            class="bg-current rotate-90 rtl:-rotate-90 [mask-image:url(/src/assets/icons/arrow_up.svg)]">
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/arrow_up.svg)`"
+                                            class="bg-current rotate-90 rtl:-rotate-90">
                                             <img
-                                                src="/src/assets/icons/arrow_up.svg"
+                                                :src="`${this.base_path}src/assets/icons/arrow_up.svg`"
                                                 alt="Next page"
                                                 class="h-4 opacity-0" />
                                         </div>
@@ -1027,9 +1049,10 @@
                                         class="p-2.5 min-w-[40px] inline-flex justify-center items-center gap-x-2 text-sm rounded-full hover:bg-gray-100 focus:outline-none focus:bg-gray-100 disabled:opacity-50 disabled:pointer-events-none dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                                         aria-label="Last">
                                         <div
-                                            class="bg-current rotate-90 rtl:-rotate-90 [mask-image:url(/src/assets/icons/double_arrow_up.svg)]">
+                                            :style="`mask-image:url(${this.base_path}src/assets/icons/double_arrow_up.svg)`"
+                                            class="bg-current rotate-90 rtl:-rotate-90">
                                             <img
-                                                src="/src/assets/icons/double_arrow_up.svg"
+                                                :src="`${this.base_path}src/assets/icons/double_arrow_up.svg`"
                                                 alt="Last page"
                                                 class="h-4 opacity-0" />
                                         </div>
