@@ -12,7 +12,7 @@ jobs:
     env:
       VITE_BASE_PATH: /
       VITE_GGE_API_URL: ${{ vars.VITE_GGE_API_URL }}
-      VITE_E4K_API_URL: ${{ vars.VITE_EK4_API_URL }}
+      VITE_E4K_API_URL: ${{ vars.VITE_E4K_API_URL }}
       VITE_PROXY_URL: ${{ vars.VITE_PROXY_URL }}
 
     steps:
@@ -42,7 +42,7 @@ jobs:
     env:
       VITE_BASE_PATH: /${{ github.event.repository.name }}/
       VITE_GGE_API_URL: ${{ vars.VITE_GGE_API_URL }}
-      VITE_E4K_API_URL: ${{ vars.VITE_EK4_API_URL }}
+      VITE_E4K_API_URL: ${{ vars.VITE_E4K_API_URL }}
       VITE_PROXY_URL: ${{ vars.VITE_PROXY_URL }}
 
     steps:
