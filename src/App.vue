@@ -58,7 +58,7 @@
                 );
                 languages_file = await languages_file.json();
 
-                let languages_texts = await fetch(`https://langserv.public.ggs-ep.com/em/en/language_native_*`);
+                let languages_texts = await fetch(`https://translations-api-test.public.ggs-ep.com/12/en/language_native_*`);
                 languages_texts = await languages_texts.json();
 
                 this.languages = Object.keys(languages_file.languages).filter(
@@ -72,7 +72,7 @@
             },
 
             async getTexts() {
-                let texts_file = await fetch(`https://langserv.public.ggs-ep.com/em/${this.current_language}`);
+                let texts_file = await fetch(`https://translations-api-test.public.ggs-ep.com/12/${this.current_language}`);
                 this.texts = await texts_file.json();
             },
 
