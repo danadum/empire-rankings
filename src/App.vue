@@ -188,19 +188,19 @@
             async previousPage() {
                 this.current_search = Math.max(
                     1,
-                    this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] - this.players.length || 1,
+                    this.players[this.currentEvent.global ? 0 : (this.players.length - 1) >> 1]?.[this.currentEvent.global ? "R" : this.offset(0)] - this.players.length || 1,
                 );
                 await this.getRankings();
             },
 
             async nextPage() {
                 this.current_search =
-                    this.players[(this.players.length - 1) >> 1]?.[this.offset(0)] + this.players.length || 1;
+                    this.players[this.currentEvent.global ? 0 : (this.players.length - 1) >> 1]?.[this.currentEvent.global ? "R" : this.offset(0)] + this.players.length || 1;
                 await this.getRankings();
             },
 
             async toPage(page) {
-                this.current_search = this.players.length * (page - 1) + ((this.players.length - 1) >> 1);
+                this.current_search = this.players.length * (page - 1) + ( this.currentEvent.global ? 1 : (this.players.length - 1) >> 1);
                 await this.getRankings();
             },
 
@@ -231,13 +231,21 @@
                         this.current_search = 1;
                     }
                     if (this.current_category_index >= 0) {
-                        await this.getRankingsBySearch();
+                        if (this.currentEvent.global) {
+                            await this.getGlobalRankingsByRank();
+                        } else {
+                            await this.getRankingsBySearch();
+                        }
                     } else {
                         await this.getRankingsByAlliance(this.alliance_id);
                     }
                 } else {
                     if (this.current_category_index >= 0) {
-                        await this.getRankingsByName();
+                        if (this.currentEvent.global) {
+                            await this.getGlobalRankingsByName();
+                        } else {
+                            await this.getRankingsByName();
+                        }
                     } else {
                         await this.getRankingsByNameInAlliance();
                     }
@@ -265,6 +273,9 @@
                         this.players = null;
                         this.last_rank = 1;
                     }
+                } else if (jsonData.error) {
+                    this.players = null;
+                    this.last_rank = 1;
                 } else {
                     this.players = [];
                     this.last_rank = 1;
@@ -278,6 +289,83 @@
                 if (this.players.length == 0) {
                     this.players = players;
                     this.last_rank = last_rank;
+                    alert(
+                        this.alliance_ranking
+                            ? this.texts.alert_allianceName_notFound
+                            : this.texts.alert_playerName_notFound,
+                    );
+                }
+            },
+
+            async getGlobalRankingsByRank() {
+                const response = await fetch(
+                    `${this.apiURL}/${this.current_server_header}/llsp/%22LT%22:${this.currentEventId},%22LID%22:${this.currentCategory.id},%22R%22:${encodeURIComponent(this.current_search)}`,
+                );
+                const jsonData = await response.json();
+                if (jsonData.return_code == "0") {
+                    if (jsonData.content.L.length) {
+                        this.players = jsonData.content.L;
+                        this.last_rank = jsonData.content.T;
+                        this.current_category_index = Math.max(
+                            0,
+                            this.currentEvent.categories.findIndex(
+                                (category) =>
+                                    category.eventid == this.currentCategory.eventid &&
+                                    category.id == jsonData.content.LID,
+                            ),
+                        );
+                    } else {
+                        this.players = null;
+                        this.last_rank = 1;
+                    }
+                } else if (jsonData.error) {
+                    this.players = null;
+                    this.last_rank = 1;
+                } else {
+                    this.players = [];
+                    this.last_rank = 1;
+                }
+            },
+
+            async getGlobalRankingsByName() {
+                const response = await fetch(
+                    `${this.apiURL}/${this.current_server_header}/slse/%22LT%22:${this.currentEventId},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`,
+                );
+                const jsonData1 = await response.json();
+                if (jsonData1.return_code == "0" && jsonData1.content.L.length && jsonData1.content.L[0].L.length) {
+                    const searchCategory = jsonData1.content.L[0].LID;
+                    const searchId = jsonData1.content.L[0].L[0];
+                    const response = await fetch(
+                        `${this.apiURL}/${this.current_server_header}/llsw/%22LT%22:${this.currentEventId},%22LID%22:${searchCategory},%22SI%22:%22${encodeURIComponent(searchId)}%22`,
+                    );
+                    const jsonData = await response.json();
+                    if (jsonData.return_code == "0") {
+                        if (jsonData.content.L.length) {
+                            this.players = jsonData.content.L;
+                            this.last_rank = jsonData.content.T;
+                            this.current_category_index = Math.max(
+                                0,
+                                this.currentEvent.categories.findIndex(
+                                    (category) =>
+                                        category.eventid == this.currentCategory.eventid &&
+                                        category.id == jsonData.content.LID,
+                                ),
+                            );
+                        } else {
+                            alert(
+                                this.alliance_ranking
+                                    ? this.texts.alert_allianceName_notFound
+                                    : this.texts.alert_playerName_notFound,
+                            );
+                        }
+                    } else {
+                        alert(
+                        this.alliance_ranking
+                            ? this.texts.alert_allianceName_notFound
+                            : this.texts.alert_playerName_notFound,
+                        );
+                    }
+                } else {
                     alert(
                         this.alliance_ranking
                             ? this.texts.alert_allianceName_notFound
@@ -377,6 +465,14 @@
                     player[this.offset(2 + this.alliance_ranking)]?.KLMO?.find((medal) => medal[0] == type)?.[1] ?? 0
                 );
             },
+
+            getPlayerServerName(player) {
+                const serverId = player.SI.split("-")[2];
+                const baseServerKey = this.game === "e4k" ? "EmpirefourkingdomsExGG" : "EmpireEx";
+                const serverKey = serverId === "1" ? baseServerKey : baseServerKey + "_" + serverId;
+                const server = this.servers[serverKey];
+                return server ? this.texts[server.name] + " " + server.id : "";
+            },
         },
 
         computed: {
@@ -410,7 +506,7 @@
 
             currentPageNumber() {
                 return this.players?.length > 0
-                    ? ~~((this.players.at(-1)[this.offset(0)] - 1) / this.players.length) + 1
+                    ? ~~((this.players.at(-1)[this.currentEvent.global ? "R" : this.offset(0)] - 1) / this.players.length) + 1
                     : 1;
             },
 
@@ -702,6 +798,12 @@
                                                 }}
                                             </th>
                                             <th
+                                                v-if="this.currentEvent.global"
+                                                scope="col"
+                                                class="px-1 py-3 text-center text-xs font-medium text-neutral-400 uppercase dark:text-neutral-500">
+                                                {{ this.texts.generic_server?.replace(/ ?: ?/g, '') }}
+                                            </th>
+                                            <th
                                                 v-if="this.hasPoints"
                                                 scope="col"
                                                 class="px-1 py-3 text-center text-xs font-medium text-neutral-400 uppercase dark:text-neutral-500">
@@ -747,76 +849,108 @@
                                         <tr
                                             :class="{
                                                 'bg-yellow-300':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 1,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 1,
                                                 'hover:bg-yellow-400':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 1,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 1,
                                                 'dark:bg-yellow-600':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 1,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 1,
                                                 'dark:hover:bg-yellow-500':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 1,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 1,
                                                 'bg-gray-300':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 2,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 2,
                                                 'hover:bg-gray-400':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 2,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 2,
                                                 'dark:bg-gray-600':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 2,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 2,
                                                 'dark:hover:bg-gray-500':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 2,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 2,
                                                 'bg-yellow-700':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 3,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 3,
                                                 'hover:bg-yellow-800':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 3,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 3,
                                                 'dark:bg-yellow-900':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 3,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 3,
                                                 'dark:hover:bg-yellow-800':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) === 3,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) === 3,
                                                 'hover:bg-neutral-100':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) > 3,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) > 3,
                                                 'dark:hover:bg-neutral-700':
-                                                    (this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : player[this.offset(0)]) > 3,
+                                                    (this.currentEvent.global
+                                                        ? player.R
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : player[this.offset(0)]) > 3,
                                             }"
                                             v-for="(player, index) in this.players"
                                             :key="index">
                                             <td class="px-1 py-2 whitespace-nowrap text-center text-sm font-medium">
                                                 {{
-                                                    this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(4)]
-                                                        : this.formatNumber(player[this.offset(0)])
+                                                    this.currentEvent.global
+                                                        ? this.formatNumber(player.R)
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(4)]
+                                                            : this.formatNumber(player[this.offset(0)])
                                                 }}
                                             </td>
                                             <td class="px-1 py-2 whitespace-nowrap text-center text-sm">
                                                 {{
-                                                    this.currentCategory.isCurrentOuter
-                                                        ? player[this.offset(3)]
-                                                        : player[this.offset(2)]?.[this.alliance_ranking ? 1 : "N"]
+                                                    this.currentEvent.global
+                                                        ? player.P
+                                                        : this.currentCategory.isCurrentOuter
+                                                            ? player[this.offset(3)]
+                                                            : player[this.offset(2)]?.[this.alliance_ranking ? 1 : "N"]
                                                 }}
                                             </td>
                                             <td
@@ -841,12 +975,27 @@
                                             <td
                                                 v-if="!this.currentCategory.isCurrentOuter && !this.alliance_ranking"
                                                 class="px-1 py-2 whitespace-nowrap text-center text-sm">
-                                                {{ player[this.offset(2)]?.AN }}
+                                                {{
+                                                    this.currentEvent.global
+                                                        ? player.A
+                                                        : player[this.offset(2)]?.AN
+                                                }}
+                                            </td>
+                                            <td
+                                                v-if="this.currentEvent.global"
+                                                class="px-1 py-2 whitespace-nowrap text-center text-sm">
+                                                {{             
+                                                    this.getPlayerServerName(player)
+                                                }}
                                             </td>
                                             <td
                                                 v-if="this.hasPoints"
                                                 class="px-1 py-2 whitespace-nowrap text-center text-sm">
-                                                {{ this.formatNumber(player[this.offset(1)]) }}
+                                                {{
+                                                    this.currentEvent.global
+                                                        ? this.formatNumber(player.S)
+                                                        : this.formatNumber(player[this.offset(1)])
+                                                }}
                                             </td>
                                             <td
                                                 v-if="this.hasMedals && !this.alliance_ranking"
@@ -948,7 +1097,7 @@
                                         :class="{
                                             invisible:
                                                 this.currentPageNumber === 1 &&
-                                                (this.players?.[0]?.[this.offset(0)] ?? 1) === 1,
+                                                (this.players?.[0]?.[this.currentEvent.global ? 'R' : this.offset(0)] ?? 1) === 1,
                                         }"
                                         @click="this.firstPage"
                                         type="button"
@@ -967,7 +1116,7 @@
                                         :class="{
                                             invisible:
                                                 this.currentPageNumber === 1 &&
-                                                (this.players?.[0]?.[this.offset(0)] ?? 1) === 1,
+                                                (this.players?.[0]?.[this.currentEvent.global ? 'R' : this.offset(0)] ?? 1) === 1,
                                         }"
                                         @click="this.previousPage"
                                         type="button"
@@ -1025,7 +1174,7 @@
                                         :class="{
                                             invisible:
                                                 this.currentPageNumber === this.lastPageNumber &&
-                                                (this.players?.at(-1)?.[this.offset(0)] ?? 1) === this.last_rank,
+                                                (this.players?.at(-1)?.[this.currentEvent.global ? 'R' : this.offset(0)] ?? 1) === this.last_rank,
                                         }"
                                         @click="this.nextPage"
                                         type="button"
@@ -1044,7 +1193,7 @@
                                         :class="{
                                             invisible:
                                                 this.currentPageNumber === this.lastPageNumber &&
-                                                (this.players?.at(-1)?.[this.offset(0)] ?? 1) === this.last_rank,
+                                                (this.players?.at(-1)?.[this.currentEvent.global ? 'R' : this.offset(0)] ?? 1) === this.last_rank,
                                         }"
                                         @click="this.lastPage"
                                         type="button"
