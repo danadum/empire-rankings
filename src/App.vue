@@ -453,7 +453,7 @@
             },
 
             formatNumber(number) {
-                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
+                return number?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
             },
 
             offset(index) {
