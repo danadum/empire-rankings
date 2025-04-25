@@ -254,7 +254,7 @@
 
             async getRankingsBySearch() {
                 const response = await fetch(
-                    `${this.apiURL}/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22LID%22:${this.currentCategory.id},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`,
+                    `${this.apiURL}/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId}${this.currentCategory.id ? ',%22LID%22:' + this.currentCategory.id : ''},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`,
                 );
                 const jsonData = await response.json();
                 if (jsonData.return_code == "0") {
@@ -266,7 +266,7 @@
                             this.currentEvent.categories.findIndex(
                                 (category) =>
                                     category.eventid == this.currentCategory.eventid &&
-                                    category.id == jsonData.content.LID,
+                                    category.id == (jsonData.content.LID ?? null),
                             ),
                         );
                     } else {
@@ -299,7 +299,7 @@
 
             async getGlobalRankingsByRank() {
                 const response = await fetch(
-                    `${this.apiURL}/${this.current_server_header}/llsp/%22LT%22:${this.currentEventId},%22LID%22:${this.currentCategory.id},%22R%22:${encodeURIComponent(this.current_search)}`,
+                    `${this.apiURL}/${this.current_server_header}/llsp/%22LT%22:${this.currentEventId}${this.currentCategory.id ? ',%22LID%22:' + this.currentCategory.id : ''},%22R%22:${encodeURIComponent(this.current_search)}`,
                 );
                 const jsonData = await response.json();
                 if (jsonData.return_code == "0") {
@@ -311,7 +311,7 @@
                             this.currentEvent.categories.findIndex(
                                 (category) =>
                                     category.eventid == this.currentCategory.eventid &&
-                                    category.id == jsonData.content.LID,
+                                    category.id == (jsonData.content.LID ?? null),
                             ),
                         );
                     } else {
@@ -336,7 +336,7 @@
                     const searchCategory = jsonData1.content.L[0].LID;
                     const searchId = jsonData1.content.L[0].L[0];
                     const response = await fetch(
-                        `${this.apiURL}/${this.current_server_header}/llsw/%22LT%22:${this.currentEventId},%22LID%22:${searchCategory},%22SI%22:%22${encodeURIComponent(searchId)}%22`,
+                        `${this.apiURL}/${this.current_server_header}/llsw/%22LT%22:${this.currentEventId}${searchCategory ? ',%22LID%22:' + searchCategory : ''},%22SI%22:%22${encodeURIComponent(searchId)}%22`,
                     );
                     const jsonData = await response.json();
                     if (jsonData.return_code == "0") {
@@ -348,7 +348,7 @@
                                 this.currentEvent.categories.findIndex(
                                     (category) =>
                                         category.eventid == this.currentCategory.eventid &&
-                                        category.id == jsonData.content.LID,
+                                        category.id == (jsonData.content.LID ?? null),
                                 ),
                             );
                         } else {
