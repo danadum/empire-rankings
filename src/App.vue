@@ -336,7 +336,7 @@
                     const searchCategory = jsonData1.content.L[0].LID;
                     const searchId = jsonData1.content.L[0].L[0];
                     const response = await fetch(
-                        `${this.apiURL}/${this.current_server_header}/llsw/%22LT%22:${this.currentEventId}${searchCategory ? ',%22LID%22:' + searchCategory : ''},%22SI%22:%22${encodeURIComponent(searchId)}%22`,
+                        `${this.apiURL}/${this.current_server_header}/llsw/%22LT%22:${this.currentEventId}${searchCategory && searchCategory !== -1 ? ',%22LID%22:' + searchCategory : ''},%22SI%22:%22${encodeURIComponent(searchId)}%22`,
                     );
                     const jsonData = await response.json();
                     if (jsonData.return_code == "0") {
@@ -467,7 +467,7 @@
             },
 
             getPlayerServerName(player) {
-                const serverId = player.SI.split("-")[2];
+                const serverId = player.SI?.split("-")?.[2];
                 const baseServerKey = this.game === "e4k" ? "EmpirefourkingdomsExGG" : "EmpireEx";
                 const serverKey = serverId === "1" ? baseServerKey : baseServerKey + "_" + serverId;
                 const server = this.servers[serverKey];
