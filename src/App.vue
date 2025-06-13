@@ -97,18 +97,36 @@
             },
 
             async getServers() {
-                let servers_file = await fetch(
-                    `${import.meta.env.VITE_PROXY_URL}${this.game === "e4k" ? "https://raw.githubusercontent.com/danadum/ggs-assets/main/e4k/network.xml" : "https://empire-html5.goodgamestudios.com/config/network/1.xml"}`,
-                );
-                servers_file = new DOMParser().parseFromString(await servers_file.text(), "text/xml");
+                let serversFilesUrls = this.game === "e4k"
+                    ? [
+                          `${import.meta.env.VITE_PROXY_URL}https://raw.githubusercontent.com/danadum/ggs-assets/main/e4k/network.xml`,
+                      ]
+                    : [
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/1.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/5.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/11.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/26.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/34.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/39.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/64.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/65.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/68.xml`,
+                      ];
+                let noNameCount = 0;
+                for (let url of serversFilesUrls) {
+                    let servers_file = await fetch(url);
+                    servers_file = new DOMParser().parseFromString(await servers_file.text(), "text/xml");
                 
-                this.servers = {};
-                for (let instance of servers_file.firstElementChild.firstElementChild.children) {
-                    if (instance.children[2].textContent != "EmpireEx_23") {
-                        this.servers[instance.children[2].textContent] = {
-                            name: instance.children[6].textContent,
-                            id: instance.children[4].textContent,
-                        };
+                    if (!this.servers) {
+                        this.servers = {};
+                    }
+                    for (let instance of servers_file.firstElementChild.firstElementChild.children) {
+                        if (instance.children[2].textContent != "EmpireEx_23") {
+                            this.servers[instance.children[2].textContent] = {
+                                name: instance.children[6].textContent,
+                                id: instance.children[6].textContent ? instance.children[4].textContent : ++noNameCount,
+                            };
+                        }
                     }
                 }
                 if (!(this.current_server_header in this.servers)) {
@@ -471,7 +489,7 @@
                 const baseServerKey = this.game === "e4k" ? "EmpirefourkingdomsExGG" : "EmpireEx";
                 const serverKey = serverId === "1" ? baseServerKey : baseServerKey + "_" + serverId;
                 const server = this.servers[serverKey];
-                return server ? this.texts[server.name] + " " + server.id : "";
+                return server ? (server.name ? this.texts[server.name] + " " + server.id : this.texts.alienInvasion_world_178.replace("1", server.id)) : "";
             },
         },
 
@@ -677,7 +695,7 @@
                         Object.entries(this.servers).map(([key, value]) => ({
                             key: key,
                             value: key,
-                            text: this.texts[value.name] + ' ' + value.id,
+                            text: value.name ? this.texts[value.name] + ' ' + value.id : this.texts.alienInvasion_world_178.replace('1', value.id),
                         }))
                     "
                     :value="this.current_server_header"
