@@ -270,9 +270,9 @@
                 }
             },
 
-            async getRankingsBySearch() {
+            async getRankingsBySearch(ignoreCategory = false) {
                 const response = await fetch(
-                    `${this.apiURL}/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId}${this.currentCategory.id ? ',%22LID%22:' + this.currentCategory.id : ''},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`,
+                    `${this.apiURL}/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId}${!ignoreCategory && this.currentCategory.id ? ',%22LID%22:' + this.currentCategory.id : ''},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`,
                 );
                 const jsonData = await response.json();
                 if (jsonData.return_code == "0") {
@@ -303,7 +303,7 @@
             async getRankingsByName() {
                 let players = this.players;
                 let last_rank = this.last_rank;
-                await this.getRankingsBySearch();
+                await this.getRankingsBySearch(true);
                 if (this.players.length == 0) {
                     this.players = players;
                     this.last_rank = last_rank;
