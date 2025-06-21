@@ -304,7 +304,7 @@
                 let players = this.players;
                 let last_rank = this.last_rank;
                 await this.getRankingsBySearch(true);
-                if (this.players.length == 0) {
+                if (this.players == null || this.players.length == 0) {
                     this.players = players;
                     this.last_rank = last_rank;
                     alert(
