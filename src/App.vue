@@ -96,30 +96,33 @@
                 await this.getRankings();
             },
 
+            async getServer(fileUrl) {
+                let servers_file = await fetch(fileUrl);
+                servers_file = new DOMParser().parseFromString(await servers_file.text(), "text/xml");
+                return servers_file;
+            },
+
             async getServers() {
                 let serversFilesUrls = this.game === "e4k"
                     ? [
-                          `${import.meta.env.VITE_PROXY_URL}https://raw.githubusercontent.com/danadum/ggs-assets/main/e4k/network.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/16/live/72.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/16/live/77.xml`,
                       ]
                     : [
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/1.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/5.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/11.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/26.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/34.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/39.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/64.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/65.xml`,
-                          `${import.meta.env.VITE_PROXY_URL}https://empire-html5.goodgamestudios.com/config/network/68.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/1.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/5.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/11.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/26.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/34.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/39.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/64.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/65.xml`,
+                          `${import.meta.env.VITE_PROXY_URL}https://media.goodgamestudios.com/games-config/network/12/live/68.xml`,
                       ];
+                let servers_files = await Promise.all(serversFilesUrls.map(url => this.getServer(url)));
+                this.servers = {};
                 let noNameCount = 0;
-                for (let url of serversFilesUrls) {
-                    let servers_file = await fetch(url);
-                    servers_file = new DOMParser().parseFromString(await servers_file.text(), "text/xml");
-                
-                    if (!this.servers) {
-                        this.servers = {};
-                    }
+                for (let servers_file of servers_files) {
                     for (let instance of servers_file.firstElementChild.firstElementChild.children) {
                         if (instance.children[2].textContent != "EmpireEx_23") {
                             this.servers[instance.children[2].textContent] = {
