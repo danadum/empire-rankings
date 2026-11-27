@@ -17,7 +17,7 @@
                     :checked="!value"
                     @click="change" />
             </label>
-            <label :for="`toggle-switch-${name}-off`" class="grow relative py-2 px-3">
+            <label :for="`toggle-switch-${name}-on`" class="grow relative py-2 px-3">
                 <span class="min-w-8 size-full flex items-center justify-center relative z-10 text-sm cursor-pointer">
                     <div v-if="choices[1].icon" class="bg-current" :style="`mask-image:url(${choices[1].icon})`">
                         <img :src="choices[1].icon" alt="Choice 2 icon" class="h-4 opacity-0" />
@@ -26,7 +26,7 @@
                     <span v-if="choices[1].text" class="ms-2">{{ choices[1].text }}</span>
                 </span>
                 <input
-                    :id="`toggle-switch-${name}-off`"
+                    :id="`toggle-switch-${name}-on`"
                     :name="`toggle-switch-${name}`"
                     type="radio"
                     class="absolute top-0 end-0 size-full border-transparent bg-transparent bg-none text-transparent rounded-lg cursor-pointer before:absolute before:inset-0 before:size-full before:rounded-lg focus:ring-offset-0 checked:before:bg-white checked:before:shadow-sm checked:bg-none dark:checked:before:bg-neutral-800 focus:ring-blue-500"
