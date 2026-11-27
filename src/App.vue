@@ -17,13 +17,14 @@
                     window.localStorage.getItem("server") ??
                     (game === "e4k" ? "EmpirefourkingdomsExGG_2" : "EmpireEx_3"),
                 current_event_name: window.sessionStorage.getItem("event") ?? "",
-                current_category_index: window.sessionStorage.getItem("category") ?? 0,
+                current_category_index: +(window.sessionStorage.getItem("category") ?? 0),
                 current_search: window.sessionStorage.getItem("search") ?? 1,
                 search_input: "",
                 last_rank: 1,
                 alliance_id: window.sessionStorage.getItem("alliance_id") ?? "",
                 alliance_players: [],
                 alliance_ranking: window.sessionStorage.getItem("alliance") === "true",
+                error_key: "eventNotRunning",
                 dark_mode:
                     window.localStorage.getItem("dark_mode") === "true"
                         ? true
@@ -122,13 +123,17 @@
                 let servers_files = await Promise.all(serversFilesUrls.map(url => this.getServer(url)));
                 this.servers = {};
                 let noNameCount = 0;
+                let labels = new Set();
                 for (let servers_file of servers_files) {
                     for (let instance of servers_file.firstElementChild.firstElementChild.children) {
                         if (instance.children[2].textContent != "EmpireEx_23") {
-                            this.servers[instance.children[2].textContent] = {
+                            let server = {
                                 name: instance.children[6].textContent,
                                 id: instance.children[6].textContent ? instance.children[4].textContent : ++noNameCount,
                             };
+                            server.duplicate = labels.has(`${server.name} ${server.id}`);
+                            labels.add(`${server.name} ${server.id}`);
+                            this.servers[instance.children[2].textContent] = server;
                         }
                     }
                 }
@@ -273,160 +278,132 @@
                 }
             },
 
-            async getRankingsBySearch(ignoreCategory = false) {
-                const response = await fetch(
-                    `${this.apiURL}/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId}${!ignoreCategory && this.currentCategory.id ? ',%22LID%22:' + this.currentCategory.id : ''},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`,
-                );
-                const jsonData = await response.json();
-                if (jsonData.return_code == "0") {
-                    if (jsonData.content.L.length) {
-                        this.players = jsonData.content.L;
-                        this.last_rank = jsonData.content.LR;
-                        this.current_category_index = Math.max(
-                            0,
-                            this.currentEvent.categories.findIndex(
-                                (category) =>
-                                    category.eventid == this.currentCategory.eventid &&
-                                    category.id == (jsonData.content.LID ?? null),
-                            ),
-                        );
-                    } else {
-                        this.players = null;
-                        this.last_rank = 1;
-                    }
-                } else if (jsonData.error) {
+            async apiRequest(command, params) {
+                const headers = encodeURIComponent(JSON.stringify(params).slice(1, -1));
+                let response;
+                try {
+                    response = await fetch(`${this.apiURL}/${this.current_server_header}/${command}/${headers}`);
+                    response = { status: response.status, body: await response.json() };
+                } catch (error) {
+                    console.error(error);
+                    return { code: "unavailable" };
+                }
+                if (response.body.return_code === 0) {
+                    return { code: 0, content: response.body.content };
+                }
+                if (response.body.return_code !== undefined) {
+                    return { code: response.body.return_code };
+                }
+                return { code: response.status === 400 ? "timeout" : "unavailable" };
+            },
+
+            errorKey(code, nameSearch = false) {
+                if (code === 21) return "alert_playerName_notFound";
+                if (code === 114) return "alert_allianceName_notFound";
+                if (code === "unavailable") return "alert_no_serverConnection";
+                if (nameSearch && (code === 0 || code === "timeout")) {
+                    return this.alliance_ranking ? "alert_allianceName_notFound" : "alert_playerName_notFound";
+                }
+                return "eventNotRunning";
+            },
+
+            showList(result, lastRank) {
+                if (result.content?.L.length) {
+                    this.players = result.content.L;
+                    this.last_rank = result.content[lastRank];
+                    this.current_category_index = Math.max(
+                        0,
+                        this.currentEvent.categories.findIndex(
+                            (category) =>
+                                category.eventid == this.currentCategory.eventid &&
+                                category.id == (result.content.LID ?? null),
+                        ),
+                    );
+                } else {
                     this.players = null;
                     this.last_rank = 1;
-                } else {
-                    this.players = [];
-                    this.last_rank = 1;
+                    this.error_key = this.errorKey(result.code);
                 }
+            },
+
+            async getRankingsBySearch(ignoreCategory = false) {
+                const result = await this.apiRequest("hgh", {
+                    LT: this.currentEventId,
+                    ...(!ignoreCategory && this.currentCategory.id ? { LID: this.currentCategory.id } : {}),
+                    SV: String(this.current_search),
+                });
+                this.showList(result, "LR");
+                return result;
             },
 
             async getRankingsByName() {
                 let players = this.players;
                 let last_rank = this.last_rank;
-                await this.getRankingsBySearch(true);
-                if (this.players == null || this.players.length == 0) {
+                const result = await this.getRankingsBySearch(true);
+                if (!result.content?.L.length) {
                     this.players = players;
                     this.last_rank = last_rank;
-                    alert(
-                        this.alliance_ranking
-                            ? this.texts.alert_allianceName_notFound
-                            : this.texts.alert_playerName_notFound,
-                    );
+                    alert(this.texts[this.errorKey(result.code, true)]);
                 }
             },
 
             async getGlobalRankingsByRank() {
-                const response = await fetch(
-                    `${this.apiURL}/${this.current_server_header}/llsp/%22LT%22:${this.currentEventId}${this.currentCategory.id ? ',%22LID%22:' + this.currentCategory.id : ''},%22R%22:${encodeURIComponent(this.current_search)}`,
-                );
-                const jsonData = await response.json();
-                if (jsonData.return_code == "0") {
-                    if (jsonData.content.L.length) {
-                        this.players = jsonData.content.L;
-                        this.last_rank = jsonData.content.T;
-                        this.current_category_index = Math.max(
-                            0,
-                            this.currentEvent.categories.findIndex(
-                                (category) =>
-                                    category.eventid == this.currentCategory.eventid &&
-                                    category.id == (jsonData.content.LID ?? null),
-                            ),
-                        );
-                    } else {
-                        this.players = null;
-                        this.last_rank = 1;
-                    }
-                } else if (jsonData.error) {
-                    this.players = null;
-                    this.last_rank = 1;
-                } else {
-                    this.players = [];
-                    this.last_rank = 1;
-                }
+                const result = await this.apiRequest("llsp", {
+                    LT: this.currentEventId,
+                    ...(this.currentCategory.id ? { LID: this.currentCategory.id } : {}),
+                    R: +this.current_search,
+                });
+                this.showList(result, "T");
             },
 
             async getGlobalRankingsByName() {
-                const response = await fetch(
-                    `${this.apiURL}/${this.current_server_header}/slse/%22LT%22:${this.currentEventId},%22SV%22:%22${encodeURIComponent(this.current_search)}%22`,
-                );
-                const jsonData1 = await response.json();
-                if (jsonData1.return_code == "0" && jsonData1.content.L.length && jsonData1.content.L[0].L.length) {
-                    const searchCategory = jsonData1.content.L[0].LID;
-                    const searchId = jsonData1.content.L[0].L[0];
-                    const response = await fetch(
-                        `${this.apiURL}/${this.current_server_header}/llsw/%22LT%22:${this.currentEventId}${searchCategory && searchCategory !== -1 ? ',%22LID%22:' + searchCategory : ''},%22SI%22:%22${encodeURIComponent(searchId)}%22`,
-                    );
-                    const jsonData = await response.json();
-                    if (jsonData.return_code == "0") {
-                        if (jsonData.content.L.length) {
-                            this.players = jsonData.content.L;
-                            this.last_rank = jsonData.content.T;
-                            this.current_category_index = Math.max(
-                                0,
-                                this.currentEvent.categories.findIndex(
-                                    (category) =>
-                                        category.eventid == this.currentCategory.eventid &&
-                                        category.id == (jsonData.content.LID ?? null),
-                                ),
-                            );
-                        } else {
-                            alert(
-                                this.alliance_ranking
-                                    ? this.texts.alert_allianceName_notFound
-                                    : this.texts.alert_playerName_notFound,
-                            );
-                        }
-                    } else {
-                        alert(
-                        this.alliance_ranking
-                            ? this.texts.alert_allianceName_notFound
-                            : this.texts.alert_playerName_notFound,
-                        );
-                    }
+                const search = await this.apiRequest("slse", { LT: this.currentEventId, SV: String(this.current_search) });
+                if (!search.content?.L.length || !search.content.L[0].L.length) {
+                    alert(this.texts[this.errorKey(search.code, true)]);
+                    return;
+                }
+                const searchCategory = search.content.L[0].LID;
+                const result = await this.apiRequest("llsw", {
+                    LT: this.currentEventId,
+                    ...(searchCategory && searchCategory !== -1 ? { LID: searchCategory } : {}),
+                    SI: search.content.L[0].L[0],
+                });
+                if (result.content?.L.length) {
+                    this.showList(result, "T");
                 } else {
-                    alert(
-                        this.alliance_ranking
-                            ? this.texts.alert_allianceName_notFound
-                            : this.texts.alert_playerName_notFound,
-                    );
+                    alert(this.texts[this.errorKey(result.code, true)]);
                 }
             },
 
             async getRankingsByAlliance() {
                 if (this.alliance_id != this.alliance_players[0]?.[this.offset(2)]?.AID) {
-                    let alliance = await fetch(
-                        `${this.apiURL}/${this.current_server_header}/ain/%22AID%22:${this.alliance_id}`,
-                    );
-                    alliance = await alliance.json();
-                    if (alliance.return_code == "0") {
-                        let members = alliance.content.A.M;
-
-                        let requests = await Promise.all(
-                            members.map(async (member) => {
-                                let response = await fetch(
-                                    `${this.apiURL}/${this.current_server_header}/hgh/%22LT%22:${this.currentEventId},%22SV%22:%22${encodeURIComponent(member.N)}%22`,
-                                );
-                                return [member, await response.json()];
-                            }),
-                        );
-
-                        let ranks = requests.map(([member, response]) => {
-                            if (response.return_code == "0") {
-                                for (let rank of response.content.L) {
-                                    if (rank[2].OID == member.OID) {
-                                        return rank;
-                                    }
-                                }
-                            }
-                            return [-1, 0, member];
-                        });
-                        ranks.sort((a, b) => b[1] - a[1]);
-                        ranks.forEach((rank, i) => (rank[0] = i + 1));
-                        this.alliance_players = ranks;
+                    const alliance = await this.apiRequest("ain", { AID: +this.alliance_id });
+                    if (alliance.code !== 0) {
+                        this.players = null;
+                        this.last_rank = 1;
+                        this.error_key = this.errorKey(alliance.code);
+                        return;
                     }
+                    let members = alliance.content.A.M;
+
+                    let requests = await Promise.all(
+                        members.map(async (member) => [
+                            member,
+                            await this.apiRequest("hgh", { LT: this.currentEventId, SV: member.N }),
+                        ]),
+                    );
+
+                    let ranks = requests.map(([member, result]) => {
+                        for (let rank of result.content?.L ?? []) {
+                            if (rank[2].OID == member.OID) {
+                                return rank;
+                            }
+                        }
+                        return [-1, 0, member];
+                    });
+                    ranks.sort((a, b) => b[1] - a[1]);
+                    ranks.forEach((rank, i) => (rank[0] = i + 1));
+                    this.alliance_players = ranks;
                 }
                 this.last_rank = this.alliance_players.length;
                 let start = Math.max(Math.min(+this.current_search - 5, this.alliance_players.length - 10), 0);
@@ -487,12 +464,19 @@
                 );
             },
 
+            serverLabel(key) {
+                const server = this.servers[key];
+                const label = server.name
+                    ? this.texts[server.name] + " " + server.id
+                    : this.texts.alienInvasion_world_178.replace("1", server.id);
+                return server.duplicate ? `${label} (${key})` : label;
+            },
+
             getPlayerServerName(player) {
                 const serverId = player.SI?.split("-")?.[2];
                 const baseServerKey = this.game === "e4k" ? "EmpirefourkingdomsExGG" : "EmpireEx";
                 const serverKey = serverId === "1" ? baseServerKey : baseServerKey + "_" + serverId;
-                const server = this.servers[serverKey];
-                return server ? (server.name ? this.texts[server.name] + " " + server.id : this.texts.alienInvasion_world_178.replace("1", server.id)) : "";
+                return this.servers[serverKey] ? this.serverLabel(serverKey) : "";
             },
         },
 
@@ -695,10 +679,10 @@
                     class="grow-[10]"
                     :title="this.texts.generic_server?.replace(/ ?: ?/g, '')"
                     :options="
-                        Object.entries(this.servers).map(([key, value]) => ({
+                        Object.keys(this.servers).map((key) => ({
                             key: key,
                             value: key,
-                            text: value.name ? this.texts[value.name] + ' ' + value.id : this.texts.alienInvasion_world_178.replace('1', value.id),
+                            text: this.serverLabel(key),
                         }))
                     "
                     :value="this.current_server_header"
@@ -809,7 +793,7 @@
                                                 {{ this.texts.dialog_highscore_name }}
                                             </th>
                                             <th
-                                                v-if="!this.currentCategory.isCurrentOuter"
+                                                v-if="!this.currentCategory.isCurrentOuter && !(this.alliance_ranking && this.currentEvent.global)"
                                                 scope="col"
                                                 class="px-1 py-3 text-center text-xs font-medium text-neutral-400 uppercase dark:text-neutral-500">
                                                 {{
@@ -860,7 +844,7 @@
                                                     class="h-20 opacity-0" />
                                             </div>
                                             <span>
-                                                {{ this.texts.eventNotRunning }}
+                                                {{ this.texts[this.error_key] }}
                                             </span>
                                         </div>
                                     </tbody>
@@ -968,14 +952,14 @@
                                             <td class="px-1 py-2 whitespace-nowrap text-center text-sm">
                                                 {{
                                                     this.currentEvent.global
-                                                        ? player.P
+                                                        ? player[this.alliance_ranking ? "A" : "P"]
                                                         : this.currentCategory.isCurrentOuter
                                                             ? player[this.offset(3)]
                                                             : player[this.offset(2)]?.[this.alliance_ranking ? 1 : "N"]
                                                 }}
                                             </td>
                                             <td
-                                                v-if="!this.currentCategory.isCurrentOuter && this.alliance_ranking"
+                                                v-if="!this.currentCategory.isCurrentOuter && this.alliance_ranking && !this.currentEvent.global"
                                                 class="px-1 py-2 whitespace-nowrap text-center text-sm font-medium">
                                                 <button
                                                     @click="this.toggleAlliancePlayersRanking(player[this.offset(2)])"
